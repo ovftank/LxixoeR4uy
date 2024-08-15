@@ -1,0 +1,11 @@
+{
+	"plugins": ["prettier-plugin-tailwindcss"],
+	"tailwindConfig": "./tailwind.config.ts",
+	"endOfLine": "crlf",
+	"jsxSingleQuote": true,
+	"singleQuote": true,
+	"tabWidth": 4,
+	"trailingComma": "all",
+	"useTabs": true,
+	"vueIndentScriptAndStyle": true
+}
