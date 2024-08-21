@@ -1,0 +1,6 @@
+refactor: Enhance Components and Clean VSCode Config
+
+- feat: Added Footer.tsx, Header.tsx, and new pages.
+- chore: Removed VSCode settings and snippets.
+- refactor: Updated PasswordInput.tsx and Router.tsx.
+- style: Adjusted index.html, index.css, and updated yarn.lock.
