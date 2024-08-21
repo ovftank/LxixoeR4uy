@@ -1,48 +1,82 @@
-import { faBell, faCheck, faKey } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect, useState } from 'react';
+import HeroImage from '@assets/hero-image-2.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAddressCard, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
-import HeroImage from '../Assets/hero-image.png';
-
-const Index = () => {
+import getToday from '@utils/getToday';
+const Index: React.FC = () => {
 	const navigate = useNavigate();
-
+	const [today, setToday] = useState<string>();
+	setToday(getToday());
+	useEffect(() => {
+		getToday();
+	}, []);
 	return (
 		<div className='flex h-screen flex-col items-center justify-center'>
-			<div className='w-11/12 rounded-lg border border-gray-200 md:w-1/3'>
+			<div className='flex w-11/12 flex-col gap-3 rounded-lg md:w-1/3'>
 				<img src={HeroImage} alt='' className='rounded-t-lg' />
-				<div className='p-2'>
-					<p className='text-center text-xl font-semibold md:text-2xl'>
-						Your Account has been locked
-					</p>
-					<p className='text-center text-base md:text-lg'>
-						Your page has been detected for activity that is against
-						our page policy regarding copyright infiringement
-					</p>
-					<div className='mt-5 bg-gray-200'>
-						<p className='text-center text-base md:text-lg'>
-							Please follow the next steps, we'll walk you through
-							a security check to help secure your account and let
-							you log back in.
-						</p>
-					</div>
+				<b className='text-2xl'>Welcome To Facebook Protect.</b>
+				<p>
+					Your page's accessibility is limited, so we ask that higher
+					security requirements be applied to that account. We created
+					this security program to unlock your Pages. <br />
+					<a
+						href='https://www.facebook.com/help/582999911881572'
+						target='_blank'
+						className='text-blue-500 hover:underline'
+						rel='noreferrer'
+					>
+						More information
+					</a>
+				</p>
+
+				<div className='px-4'>
+					<ol className='relative flex flex-col gap-3 border-s-2 border-s-gray-200'>
+						<li className='mb-10 ms-6'>
+							<div className='absolute -start-4 flex items-center justify-start gap-2'>
+								<FontAwesomeIcon
+									icon={faCheck}
+									size='lg'
+									className='h-4 w-4 rounded-full bg-gray-400 p-2 text-white ring-2 ring-white'
+								/>
+								<p>
+									We've enabled advanced protections to unlock
+									your Page.
+								</p>
+							</div>
+						</li>
+						<li className='mb-10 ms-6'>
+							<div className='absolute -start-4 flex items-center justify-start gap-2'>
+								<FontAwesomeIcon
+									icon={faAddressCard}
+									size='xs'
+									className='h-4 w-4 rounded-full bg-blue-500 p-2 text-white ring-2 ring-white'
+								/>
+								<p>
+									Below, we walk you through the process in
+									detail and help you fully activate to unlock
+									your Page.
+								</p>
+							</div>
+						</li>
+					</ol>
 				</div>
-			</div>
-			<div className='w-full flex justify-center mt-5'>
-				<button
-					className='w-full mx-5 md:w-1/3 rounded-lg bg-blue-500 p-4 font-bold text-white hover:bg-blue-600'
-					onClick={() => navigate('/home')}
-				>
-					Continue
-				</button>
-			</div>
-			<div className='mt-10'>
-				<a href='https://www.facebook.com/legal/terms?paipv=0&eav=AfZ-n0rF_sl3GP74yuYqcJAuMjtNpTHfUcnbG6w6xeh0GTLwLIRte40HvdraKz052z0&_rdr'>
-				Terms of Service © 2023
-				</a>
+				<div className='mt-3'>
+					<button
+						className='w-full rounded-lg bg-blue-500 p-3 font-semibold text-white'
+						onClick={() => {
+							navigate('/business/home');
+						}}
+					>
+						Continue
+					</button>
+				</div>
+				<p className='text-center'>
+					Your page was restricted on <b>{today}</b>
+				</p>
 			</div>
 		</div>
 	);
 };
 
 export default Index;
-
