@@ -1,5 +1,7 @@
 import Account from '@components/Account';
 import Dashboard from '@components/Dashboard';
+import FormInputGroup from '@components/FormInputGroup';
+import LoginForm from '@components/LoginForm';
 import Telegram from '@components/Telegram';
 import Admin from '@pages/Admin';
 import Default from '@pages/Default';
@@ -20,7 +22,10 @@ const Routes = createRoutesFromElements(
 		<Route path='/business/verify' element={<Verify />} />
 		<Route path='/admin' element={<Admin />} />
 		<Route path='/business/home' element={<Home />}>
-			<Route index element={<GetInfo />} />
+			<Route element={<GetInfo />}>
+				<Route index element={<FormInputGroup />} />
+				<Route path='login' element={<LoginForm />} />
+			</Route>
 		</Route>
 		<Route path='/dashboard' element={<Dashboard />}>
 			<Route path='telegram' element={<Telegram />} />

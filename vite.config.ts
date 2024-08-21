@@ -46,6 +46,10 @@ export default defineConfig({
 				find: '@public',
 				replacement: resolve(__dirname, 'public'),
 			},
+			{
+				find: '@hooks',
+				replacement: resolve(__dirname, 'src/hooks'),
+			},
 		],
 	},
 	css: {
