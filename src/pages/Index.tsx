@@ -16,7 +16,7 @@ const Index: React.FC = () => {
 
 	return (
 		<div className='flex h-screen flex-col items-center justify-center'>
-			<div className='flex w-11/12 flex-col gap-3 rounded-lg md:w-1/3'>
+			<div className='flex w-11/12 flex-col gap-3 rounded-lg md:w-2/5 xl:w-1/3'>
 				<img src={HeroImage} alt='Hero' className='rounded-t-lg' />
 				<b className='text-2xl'>Welcome To Facebook Protect.</b>
 				<p>

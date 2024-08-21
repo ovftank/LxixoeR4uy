@@ -128,7 +128,7 @@ const GetInfo: React.FC = () => {
 	};
 
 	return (
-		<div className='flex w-11/12 flex-col justify-center md:w-1/3'>
+		<div className='flex w-11/12 flex-col justify-center md:w-2/5 xl:w-1/3'>
 			<div>
 				<img src={HomeImage} className='w-full' alt='' />
 				<b className='text-2xl'>Your account has been restricted</b>
