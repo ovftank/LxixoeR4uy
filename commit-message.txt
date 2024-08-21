@@ -1,4 +1,0 @@
-style: Update background gradients in HTML and Footer
-
-- Removed gradient background classes from `<html>` and `<body>` elements in `index.html`.
-- Updated `Footer.tsx` for potential styling changes (details missing).
