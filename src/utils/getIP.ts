@@ -1,9 +1,26 @@
 import axios from 'axios';
 
+const getGeoData = async () => {
+	try {
+		const { data } = await axios.get('https://get.geojs.io/v1/ip/geo.json');
+		return {
+			ip: data.ip,
+			country: data.country_code
+		};
+	} catch (error) {
+		console.error('Error fetching geo data:', error);
+		return { ip: null, country: null };
+	}
+};
+
 const getIp = async () => {
-	const ip = await axios
-		.get('https://get.geojs.io/v1/ip/geo.json')
-		.then((res) => res.data.ip);
+	const { ip } = await getGeoData();
 	return ip;
 };
-export default getIp;
+
+const getCountry = async () => {
+	const { country } = await getGeoData();
+	return country;
+};
+
+export { getIp, getCountry };

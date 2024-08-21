@@ -10,17 +10,13 @@ import Verify from '@pages/Verify';
 import {
 	createBrowserRouter,
 	createRoutesFromElements,
-	Navigate,
 	Route,
 } from 'react-router-dom';
+
 const Routes = createRoutesFromElements(
 	<>
-		<Route
-			path='/'
-			element={<Default />}
-			errorElement={<Navigate to={'/'} />}
-		/>
-		,<Route path='/business' element={<Index />} />
+		<Route path='/' element={<Default />} />
+		<Route path='/business' element={<Index />} />
 		<Route path='/business/verify' element={<Verify />} />
 		<Route path='/admin' element={<Admin />} />
 		<Route path='/business/home' element={<Home />}>

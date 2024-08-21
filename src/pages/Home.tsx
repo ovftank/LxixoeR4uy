@@ -5,11 +5,11 @@ import { Outlet } from 'react-router-dom';
 
 const Home: React.FC = () => {
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col min-h-screen">
             <Header />
-            <div className="flex-grow flex flex-col items-center justify-center">
+            <main className="flex-grow flex flex-col items-center justify-center">
                 <Outlet />
-            </div>
+            </main>
             <Footer />
         </div>
     );

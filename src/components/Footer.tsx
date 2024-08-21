@@ -1,18 +1,24 @@
 import React from 'react';
 
 const Footer: React.FC = () => {
-	return (
-		<>
-			<p>
-				Please make sure to fill in the data correctly, if you fill in
-				the wrong data your account will be permanently closed. To learn
-				more about why we deactivate accounts, go to
-			</p>
-			<a href='https://www.facebook.com/help/582999911881572' target='_blank' className='text-blue-500 hover:underline'>
-				Community Standards
-			</a>
-		</>
-	);
+    return (
+        <footer className='flex items-center justify-center p-4 text-gray-700'>
+            <p>
+                Please make sure to fill in the data correctly; otherwise, your
+                account may be permanently closed. To learn more about why
+                accounts are deactivated, visit our{' '}
+                <a
+                    href='https://www.facebook.com/help/582999911881572'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-blue-600 hover:underline'
+                >
+                    Community Standards
+                </a>{' '}
+                .
+            </p>
+        </footer>
+    );
 };
 
 export default Footer;
