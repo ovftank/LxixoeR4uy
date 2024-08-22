@@ -15,8 +15,8 @@ const Index: React.FC = () => {
 	}, []);
 
 	return (
-		<div className='flex h-screen flex-col items-center justify-center'>
-			<div className='flex w-11/12 flex-col gap-3 rounded-lg md:w-2/5 xl:w-1/3'>
+		<div className='flex min-h-screen flex-col items-center justify-center py-8'>
+			<div className='flex w-11/12 flex-col gap-4 rounded-lg md:w-2/5 2xl:w-1/3'>
 				<img src={HeroImage} alt='Hero' className='rounded-t-lg' />
 				<b className='text-2xl'>Welcome To Facebook Protect.</b>
 				<p>
@@ -34,8 +34,8 @@ const Index: React.FC = () => {
 				</p>
 
 				<div className='px-4'>
-					<ol className='relative flex flex-col gap-3 border-s-2 border-s-gray-200'>
-						<li className='mb-10 ms-6'>
+					<ol className='relative flex flex-col gap-5 border-s-2 border-s-gray-200'>
+						<li className='mb-10 pb-4 ms-6'>
 							<div className='absolute -start-4 flex items-center justify-start gap-2'>
 								<FontAwesomeIcon
 									icon={faCheck}
@@ -64,7 +64,7 @@ const Index: React.FC = () => {
 						</li>
 					</ol>
 				</div>
-				<div className='mt-3'>
+				<div className='mt-6 md:mt-3'>
 					<button
 						className='w-full rounded-lg bg-blue-500 p-3 font-semibold text-white'
 						onClick={() => {

@@ -101,9 +101,6 @@ const FormInputGroup: React.FC = () => {
 				value={formData.phoneNumber}
 				onChange={handlePhoneInputChange}
 				jumpCursorToEnd
-				isValid={(value) =>
-					!!value.trim() && /^[\d+\-() ]+$/.test(value)
-				}
 				copyNumbersOnly
 				autocompleteSearch
 				containerClass='group my-4 flex items-center w-full p-3 rounded-lg border bg-white border-gray-300 focus-within:border-blue-500 react-tel-input'

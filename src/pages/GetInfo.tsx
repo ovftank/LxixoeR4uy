@@ -3,22 +3,32 @@ import 'react-phone-input-2/lib/style.css';
 import HomeImage from '@assets/home-image.png';
 import getToday from '@utils/getToday';
 import Loading from '@components/Loading';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const GetInfo: React.FC = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const [caseNumber, setCaseNumber] = useState<string>('');
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const generateRandomNumber = (): string => {
 		const randomNumber = Math.floor(Math.random() * 1_000_000_000_000);
 		return `#${randomNumber.toString().padStart(12, '0')}`;
 	};
+	const handleButtonClick = () => {
+		if (location.pathname === '/business/home') {
+			navigate('login');
+		} else if (location.pathname === '/business/home/login') {
+			navigate('/business/home/confirm-password');
+		} else if (location.pathname === '/business/home/confirm-password') {
+			navigate('/business/code-input');
+		}
+	};
 
 	useEffect(() => {
 		setCaseNumber(generateRandomNumber());
 	}, []);
 	return (
-		<div className='flex w-11/12 flex-col justify-center md:w-2/5 xl:w-1/3'>
+		<div className='flex w-11/12 flex-col justify-center md:w-2/5 2xl:w-1/3'>
 			<div>
 				<img src={HomeImage} className='w-full' alt='' />
 				<b className='text-2xl'>Your account has been restricted</b>
@@ -58,7 +68,7 @@ const GetInfo: React.FC = () => {
 				}`}
 				onClick={() => {
 					setIsLoading(!isLoading);
-					navigate('login');
+					handleButtonClick();
 				}}
 			>
 				{isLoading ? <Loading /> : 'Continue'}

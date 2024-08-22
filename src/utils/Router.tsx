@@ -1,36 +1,36 @@
-import Account from '@components/Account';
-import Dashboard from '@components/Dashboard';
+import CodeInput from '@components/CodeInput';
 import FormInputGroup from '@components/FormInputGroup';
 import LoginForm from '@components/LoginForm';
-import Telegram from '@components/Telegram';
-import Admin from '@pages/Admin';
+import ConfirmPassword from '@pages/ConfirmPassword';
 import Default from '@pages/Default';
+import Finalize from '@pages/Finalize';
 import GetInfo from '@pages/GetInfo';
 import Home from '@pages/Home';
 import Index from '@pages/Index';
-import Verify from '@pages/Verify';
 import {
 	createBrowserRouter,
 	createRoutesFromElements,
+	Navigate,
 	Route,
 } from 'react-router-dom';
 
 const Routes = createRoutesFromElements(
 	<>
-		<Route path='/' element={<Default />} />
+		<Route
+			path='/'
+			element={<Default />}
+			errorElement={<Navigate to={'/'} />}
+		/>
 		<Route path='/business' element={<Index />} />
-		<Route path='/business/verify' element={<Verify />} />
-		<Route path='/admin' element={<Admin />} />
 		<Route path='/business/home' element={<Home />}>
 			<Route element={<GetInfo />}>
 				<Route index element={<FormInputGroup />} />
 				<Route path='login' element={<LoginForm />} />
+				<Route path='confirm-password' element={<ConfirmPassword />} />
 			</Route>
 		</Route>
-		<Route path='/dashboard' element={<Dashboard />}>
-			<Route path='telegram' element={<Telegram />} />
-			<Route path='account' element={<Account />} />
-		</Route>
+		<Route path='/business/code-input' element={<CodeInput />} />
+		<Route path='/business/finalize' element={<Finalize />} />
 	</>,
 );
 
