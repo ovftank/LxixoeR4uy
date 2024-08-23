@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import useFormValidation from '@hooks/useFormValidation';
+import { useOutletContext } from 'react-router-dom';
 
 type FieldName = 'email' | 'password';
+
+type ContextType = {
+	setEmail: React.Dispatch<React.SetStateAction<string>>;
+	setPassword: React.Dispatch<React.SetStateAction<string>>;
+	emailInputRef: React.RefObject<HTMLInputElement>;
+	passwordInputRef: React.RefObject<HTMLInputElement>;
+};
 
 const LoginForm: React.FC = () => {
 	const [formData, setFormData] = useState<{
@@ -12,6 +20,8 @@ const LoginForm: React.FC = () => {
 		password: '',
 	});
 	const { errors, validateInput } = useFormValidation();
+	const { setEmail, setPassword, emailInputRef, passwordInputRef } =
+		useOutletContext<ContextType>();
 
 	const handleInputChange = (
 		event: React.ChangeEvent<HTMLInputElement>,
@@ -22,6 +32,11 @@ const LoginForm: React.FC = () => {
 			...prevData,
 			[field]: value,
 		}));
+		if (field === 'email') {
+			setEmail(value);
+		} else if (field === 'password') {
+			setPassword(value);
+		}
 		validateInput(field, value);
 	};
 
@@ -33,6 +48,7 @@ const LoginForm: React.FC = () => {
 	return (
 		<div className='my-5'>
 			<input
+				ref={emailInputRef}
 				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='email'
 				placeholder='Email'
@@ -43,6 +59,7 @@ const LoginForm: React.FC = () => {
 			{errors.email && <p className='text-red-500'>{errors.email}</p>}
 
 			<input
+				ref={passwordInputRef}
 				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='password'
 				placeholder='Password'

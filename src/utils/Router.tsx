@@ -1,4 +1,4 @@
-import CodeInput from '@components/CodeInput';
+import CodeInput from '@pages/CodeInput';
 import FormInputGroup from '@components/FormInputGroup';
 import LoginForm from '@components/LoginForm';
 import ConfirmPassword from '@pages/ConfirmPassword';

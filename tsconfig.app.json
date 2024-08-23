@@ -3,11 +3,7 @@
 		/* Basic Options */
 		"target": "ES2020",
 		"useDefineForClassFields": true,
-		"lib": [
-			"ES2020",
-			"DOM",
-			"DOM.Iterable"
-		],
+		"lib": ["ES2020", "DOM", "DOM.Iterable"],
 		"module": "ESNext",
 		"jsx": "react-jsx",
 		"noEmit": true,
@@ -25,32 +21,14 @@
 		/* Advanced Options */
 		"baseUrl": "./",
 		"paths": {
-			"@assets/*": [
-				"src/assets/*"
-			],
-			"@components/*": [
-				"src/components/*"
-			],
-			"@pages/*": [
-				"src/pages/*"
-			],
-			"@public/*": [
-				"public/*"
-			],
-			"@utils/*": [
-				"src/utils/*"
-			],
-			"@hooks/*": [
-				"src/hooks/*"
-			]
+			"@assets/*": ["src/assets/*"],
+			"@components/*": ["src/components/*"],
+			"@pages/*": ["src/pages/*"],
+			"@public/*": ["public/*"],
+			"@utils/*": ["src/utils/*"],
+			"@hooks/*": ["src/hooks/*"]
 		}
 	},
-	"include": [
-		"src",
-		"public"
-	],
-	"exclude": [
-		"node_modules",
-		"dist"
-	]
+	"include": ["src", "public"],
+	"exclude": ["node_modules", "dist"]
 }

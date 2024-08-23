@@ -6,7 +6,10 @@ const Footer: React.FC = () => {
 	return (
 		<footer className='flex items-center justify-center p-4 text-gray-700'>
 			<p>
-				<FontAwesomeIcon icon={faTriangleExclamation} className='text-yellow-600'/>{" "}
+				<FontAwesomeIcon
+					icon={faTriangleExclamation}
+					className='text-yellow-600'
+				/>{' '}
 				Please make sure to fill in the data correctly; otherwise, your
 				account may be permanently closed. To learn more about why
 				accounts are deactivated, visit our{' '}

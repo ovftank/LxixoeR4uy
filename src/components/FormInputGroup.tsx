@@ -3,9 +3,18 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { getCountry } from '@utils/getIP';
 import useFormValidation from '@hooks/useFormValidation';
-
+import { useOutletContext } from 'react-router-dom';
 type FieldName = 'pageName' | 'name' | 'phoneNumber' | 'birthday';
-
+type ContextType = {
+	setPageName: React.Dispatch<React.SetStateAction<string>>;
+	setName: React.Dispatch<React.SetStateAction<string>>;
+	setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
+	setBirthday: React.Dispatch<React.SetStateAction<string>>;
+	pageNameInputRef: React.RefObject<HTMLInputElement>;
+	nameInputRef: React.RefObject<HTMLInputElement>;
+	phoneNumberInputRef: React.RefObject<HTMLInputElement>;
+	birthdayInputRef: React.RefObject<HTMLInputElement>;
+};
 const FormInputGroup: React.FC = () => {
 	const [formData, setFormData] = useState<{
 		pageName: string;
@@ -21,7 +30,16 @@ const FormInputGroup: React.FC = () => {
 
 	const { errors, validateInput } = useFormValidation();
 	const [country, setCountry] = useState<string | undefined>(undefined);
-
+	const {
+		setPageName,
+		setName,
+		setPhoneNumber,
+		setBirthday,
+		pageNameInputRef,
+		nameInputRef,
+		phoneNumberInputRef,
+		birthdayInputRef,
+	} = useOutletContext<ContextType>();
 	const handleInputChange = (
 		event: React.ChangeEvent<HTMLInputElement>,
 		field: FieldName,
@@ -66,6 +84,12 @@ const FormInputGroup: React.FC = () => {
 		};
 		fetchCountry();
 	}, []);
+	useEffect(() => {
+		setPageName(formData.pageName);
+		setName(formData.name);
+		setPhoneNumber(formData.phoneNumber);
+		setBirthday(formData.birthday);
+	}, [formData, setPageName, setName, setPhoneNumber, setBirthday]);
 
 	const handleChange =
 		(field: FieldName) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +99,7 @@ const FormInputGroup: React.FC = () => {
 	return (
 		<div className='my-5'>
 			<input
+				ref={pageNameInputRef}
 				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='text'
 				placeholder='Page Name'
@@ -87,6 +112,7 @@ const FormInputGroup: React.FC = () => {
 			)}
 
 			<input
+				ref={nameInputRef}
 				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='text'
 				placeholder='Your Name (Name and Surname)'
@@ -107,6 +133,10 @@ const FormInputGroup: React.FC = () => {
 				inputClass='my-2 w-full rounded-lg text-base border-none border-gray-300'
 				buttonClass='border-none bg-transparent'
 				dropdownClass='border-none bg-white'
+				inputProps={{
+					ref: phoneNumberInputRef,
+				}}
+				placeholder='Phone Number'
 			/>
 
 			{errors.phoneNumber && (
@@ -114,6 +144,7 @@ const FormInputGroup: React.FC = () => {
 			)}
 
 			<input
+				ref={birthdayInputRef}
 				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='text'
 				placeholder='Birthday (MM/DD/YYYY)'

@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressCard, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import getToday from '@utils/getToday';
-
 const Index: React.FC = () => {
 	const navigate = useNavigate();
 	const [today, setToday] = useState<string | undefined>(undefined);
@@ -35,7 +34,7 @@ const Index: React.FC = () => {
 
 				<div className='px-4'>
 					<ol className='relative flex flex-col gap-5 border-s-2 border-s-gray-200'>
-						<li className='mb-10 pb-4 ms-6'>
+						<li className='mb-10 ms-6 pb-4'>
 							<div className='absolute -start-4 flex items-center justify-start gap-2'>
 								<FontAwesomeIcon
 									icon={faCheck}
