@@ -2,7 +2,7 @@ server {
     listen 80;
     server_name _;
 
-    root /root/dist;
+    root /var/www/html/dist;
     index index.html;
 
     location / {
@@ -21,6 +21,7 @@ server {
 
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
     access_log /var/log/nginx/my-app_access.log;
     error_log /var/log/nginx/my-app_error.log;
 }

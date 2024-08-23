@@ -15,11 +15,11 @@ server {
     listen 80;
     server_name _;
 
-    root /root/dist;
+    root /var/www/html/dist;
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 
     error_page 404 /404.html;
@@ -46,11 +46,11 @@ server {
     listen 80;
     server_name _;
 
-    root /root/dist;
+    root /var/www/html/dist;
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 
     error_page 404 /404.html;
@@ -72,7 +72,9 @@ server {
 EOF"
 
 echo "Đang kích hoạt website"
-cp -r dist /root
+cp -r dist /var/www/html
+sudo chown -R www-data:www-data /var/www/html/dist
+sudo chmod -R 755 /var/www/html/dist
 
 echo "Kiểm tra cấu hình Nginx..."
 sudo nginx -t
