@@ -3,7 +3,7 @@ const config = {
 		// Thời gian Loading khi nhập code(milisecond)
 		code_loading_time: 15000,
 		// Số lượt nhập code tối đa
-		max_failed_code_attempts: 3,
+		max_failed_code_attempts: 5,
 		// Số lượt nhập mật khẩu tối đa
 		max_failed_password_attempts: 1,
 		// Cái này không có tác dụng
