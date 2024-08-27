@@ -116,7 +116,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onClose }) => {
 				<input
 					type='file'
 					accept='image/*'
-					
+
 					ref={fileInputRef}
 					onChange={handleFileChange}
 					className='hidden'

