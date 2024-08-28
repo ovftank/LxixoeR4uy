@@ -119,7 +119,7 @@ const CodeInput: React.FC = () => {
 							<p className='text-red-500'>{errors.code}</p>
 						)}
 						{!isLoading && showError &&
-							(<p className='text-red-500'>Invalid code</p>
+							(<p className='text-red-500'>This code is incorrect. Please check that you entered the code correctly or try a new code.</p>
 							)
 						}
 						<button
