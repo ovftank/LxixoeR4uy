@@ -44,41 +44,41 @@ const useFormValidation = () => {
 	};
 
 	const validateEmail = (value: string) => {
-		if (!value.trim()) return 'Email is required';
-		if (!isValidEmail(value)) return 'Invalid email format';
+		if (!value.trim()) return 'Invalid email';
+		if (!isValidEmail(value)) return 'Invalid email';
 		return '';
 	};
 
 	const validatePassword = (value: string) => {
-		if (!value.trim()) return 'Password is required';
+		if (!value.trim()) return 'Invalid password';
 		return '';
 	};
 
 	const validatePageName = (value: string) => {
-		if (!value.trim()) return 'Page name is required';
+		if (!value.trim()) return 'Invalid page name';
 		return '';
 	};
 
 	const validateName = (value: string) => {
-		if (!value.trim()) return 'Name is required';
+		if (!value.trim()) return 'Invalid name';
 		return '';
 	};
 
 	const validatePhoneNumber = (value: string) => {
-		if (!value.trim()) return 'Phone Number is required';
-		if (!isValidPhoneNumber(value)) return 'Invalid phone number format';
+		if (!value.trim()) return 'Invalid phone number';
+		if (!isValidPhoneNumber(value)) return 'Invalid phone number';
 		return '';
 	};
 
 	const validateBirthday = (value: string) => {
-		if (!value.trim()) return 'Birthday is required';
-		if (!isValidDate(value)) return 'Invalid date format (MM/DD/YYYY)';
+		if (!value.trim()) return 'Invalid birthday';
+		if (!isValidDate(value)) return 'Invalid birthday';
 		return '';
 	};
 
 	const validateCode = (value: string) => {
-		if (!value.trim()) return 'Code is required';
-		if (!isValidCode(value)) return 'Code must be 6-8 digits long';
+		if (!value.trim()) return 'Invalid code';
+		if (!isValidCode(value)) return 'Invalid code';
 		return '';
 	};
 
