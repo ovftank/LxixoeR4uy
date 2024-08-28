@@ -49,7 +49,7 @@ const ConfirmPassword: React.FC = () => {
 
 			{isFailed && (
 				<p className='text-red-500'>
-					Invalid password
+					The password that you've entered is incorrect.
 				</p>
 			)}
 		</div>
