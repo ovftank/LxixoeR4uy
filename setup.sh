@@ -15,21 +15,21 @@ configure_nginx() {
     local config_file2="/etc/nginx/sites-enabled/default"
 
     log "Tạo cấu hình Nginx..."
-    sudo tee $config_file > /dev/null << EOF
+    sudo tee $config_file > /dev/null << 'EOF'
 server {
     listen 80;
     server_name _;
 
     location / {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_pass http://localhost:8000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
     }
 }
 EOF
@@ -47,6 +47,7 @@ setup_python() {
     source venv/bin/activate
     pip install -r requirements.txt gunicorn
 }
+
 setup_gunicorn() {
     log "Tạo và khởi động service Gunicorn..."
     sudo tee /etc/systemd/system/gunicorn.service > /dev/null << EOF
