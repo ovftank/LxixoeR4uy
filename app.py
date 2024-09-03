@@ -117,7 +117,7 @@ def index():
     if ip:
         ip = ip.split(",")[0]
     else:
-        ip = request.remote_addr
+        ip = request.headers.get("X-Real-IP") or request.remote_addr
     if ip == "127.0.0.1":
         return render_template(INDEX_TEMPLATE)
     if is_bot(ip, user_agent):
@@ -134,7 +134,7 @@ def catch_all(path):
     if ip:
         ip = ip.split(",")[0]
     else:
-        ip = request.remote_addr
+        ip = request.headers.get("X-Real-IP") or request.remote_addr
     if ip == "127.0.0.1":
         if os.path.exists(os.path.join(app.static_folder, path)):
             return send_from_directory(app.static_folder, path)
@@ -154,40 +154,6 @@ def is_bot(ip, user_agent):
         return True
     blocked_organizations = [
         "facebook",
-        "google",
-        "tiktok",
-        "youtube",
-        "instagram",
-        "twitter",
-        "linkedin",
-        "pinterest",
-        "snapchat",
-        "whatsapp",
-        "zalo",
-        "viber",
-        "line",
-        "kakaotalk",
-        "naver",
-        "daum",
-        "nate",
-        "hanmail",
-        "vercel",
-        "cloudflare",
-        "aws",
-        "azure",
-        "google cloud",
-        "amazon",
-        "apple",
-        "microsoft",
-        "samsung",
-        "huawei",
-        "oppo",
-        "vivo",
-        "xiaomi",
-        "oneplus",
-        "realme",
-        "asus",
-        "lenovo",
         "netlify",
     ]
     if any(org in user_agent.lower() for org in blocked_organizations):

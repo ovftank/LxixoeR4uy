@@ -28,6 +28,8 @@ jobs:
 
             - name: Copy dist folder to root
               run: cp -r dist ../
+
+            - name: Copy app.py to root
               run: cp -r app.py ../
 
             - name: Fetch all branches
