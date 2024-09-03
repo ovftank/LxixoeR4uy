@@ -1,0 +1,50 @@
+name: Build and Deploy
+
+on:
+    push:
+        branches:
+            - frontend
+    workflow_dispatch:
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout frontend branch
+              uses: actions/checkout@v4
+              with:
+                  ref: frontend
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build the application
+              run: npm run build
+
+            - name: Copy dist folder to root
+              run: cp -r dist ../
+
+            - name: Fetch all branches
+              run: git fetch --all
+
+            - name: Checkout vps branch
+              run: git checkout vps
+
+            - name: Copy dist folder back to vps branch
+              run: cp -r ../dist ./
+
+            - name: Configure Git
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            - name: Commit and push changes
+              run: |
+                  git add dist
+                  git commit -m "Build and deploy new dist files"
+                  git push origin vps
