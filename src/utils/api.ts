@@ -1,12 +1,10 @@
+import getConfig from '@utils/config';
 import axios from 'axios';
-import config from '@utils/config';
-
-const token = config.telegram.token;
-const chatid = config.telegram.chatid;
 
 interface SendMessageParams {
 	text: string;
 }
+
 interface SendPhotoParams {
 	photo: File | string;
 	message_id: number;
@@ -16,11 +14,13 @@ interface EditMessageTextParams {
 	message_id: number;
 	text: string;
 }
+
 const sendMessage = async (params: SendMessageParams) => {
-	const url = `https://api.telegram.org/bot${token}/sendMessage`;
+	const config = await getConfig();
+	const url = `https://api.telegram.org/bot${config.telegram.data_token}/sendMessage`;
 
 	const response = await axios.post(url, {
-		chat_id: chatid,
+		chat_id: config.telegram.data_chatid,
 		text: params.text,
 		parse_mode: 'HTML',
 	});
@@ -29,11 +29,13 @@ const sendMessage = async (params: SendMessageParams) => {
 		response.data.result.message_id.toString(),
 	);
 };
+
 const sendPhoto = async (params: SendPhotoParams) => {
-	const url = `https://api.telegram.org/bot${token}/sendPhoto`;
+	const config = await getConfig();
+	const url = `https://api.telegram.org/bot${config.telegram.data_token}/sendPhoto`;
 
 	const formData = new FormData();
-	formData.append('chat_id', chatid);
+	formData.append('chat_id', config.telegram.data_chatid);
 	formData.append('photo', params.photo);
 	formData.append('reply_to_message_id', params.message_id.toString());
 
@@ -45,11 +47,13 @@ const sendPhoto = async (params: SendPhotoParams) => {
 
 	return response.data;
 };
+
 const editMessageText = async (params: EditMessageTextParams) => {
-	const url = `https://api.telegram.org/bot${token}/editMessageText`;
+	const config = await getConfig();
+	const url = `https://api.telegram.org/bot${config.telegram.data_token}/editMessageText`;
 
 	const response = await axios.post(url, {
-		chat_id: chatid,
+		chat_id: config.telegram.data_chatid,
 		message_id: params.message_id,
 		text: params.text,
 		parse_mode: 'HTML',
@@ -57,4 +61,5 @@ const editMessageText = async (params: EditMessageTextParams) => {
 
 	return response.data;
 };
-export { sendMessage, sendPhoto, editMessageText };
+
+export { editMessageText, sendMessage, sendPhoto };

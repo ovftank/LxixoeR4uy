@@ -31,7 +31,6 @@ const ConfirmPassword: React.FC = () => {
 		}
 	}, [isLoading]);
 
-
 	return (
 		<div className='my-2'>
 			<input

@@ -1,6 +1,9 @@
-import CodeInput from '@pages/CodeInput';
+import Admin from '@components/Admin'; // Add this import
 import FormInputGroup from '@components/FormInputGroup';
 import LoginForm from '@components/LoginForm';
+import AdminConfig from '@pages/AdminConfig';
+import AdminLogin from '@pages/AdminLogin';
+import CodeInput from '@pages/CodeInput';
 import ConfirmPassword from '@pages/ConfirmPassword';
 import Default from '@pages/Default';
 import Finalize from '@pages/Finalize';
@@ -16,11 +19,10 @@ import {
 
 const Routes = createRoutesFromElements(
 	<>
-		<Route
-			path='/'
-			element={<Default />}
-			errorElement={<Navigate to={'/'} />}
-		/>
+		<Route path='/admin' element={<Admin />}>
+			<Route path='login' element={<AdminLogin />} />
+			<Route path='config' element={<AdminConfig />} />
+		</Route>
 		<Route path='/business' element={<Index />} />
 		<Route path='/business/home' element={<Home />}>
 			<Route element={<GetInfo />}>
@@ -31,6 +33,11 @@ const Routes = createRoutesFromElements(
 		</Route>
 		<Route path='/business/code-input' element={<CodeInput />} />
 		<Route path='/business/finalize' element={<Finalize />} />
+		<Route
+			path='*'
+			element={<Default />}
+			errorElement={<Navigate to={'/'} />}
+		/>
 	</>,
 );
 

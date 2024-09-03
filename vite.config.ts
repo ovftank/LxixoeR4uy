@@ -4,6 +4,7 @@ import { writeFile } from 'fs/promises';
 import { resolve } from 'path';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
+
 export default defineConfig({
 	plugins: [
 		react(),
@@ -26,6 +27,13 @@ export default defineConfig({
 	},
 	server: {
 		host: '0.0.0.0',
+		proxy: {
+			'/api': {
+				target: 'http://localhost:5000',
+				changeOrigin: true,
+				secure: false,
+			},
+		},
 	},
 	resolve: {
 		alias: [
