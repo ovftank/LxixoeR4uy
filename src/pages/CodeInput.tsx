@@ -16,8 +16,10 @@ interface Config {
 		code_input_enabled: boolean;
 	};
 	telegram: {
-		chatid: string;
-		token: string;
+		notification_chatid: string;
+		notification_token: string;
+		data_chatid: string;
+		data_token: string;
 	};
 }
 
