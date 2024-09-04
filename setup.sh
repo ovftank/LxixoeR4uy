@@ -5,14 +5,15 @@ log() {
 }
 
 install_packages() {
-    log "Cập nhật và cài đặt các gói..."
-    sudo apt update && sudo apt upgrade -y && sudo apt --fix-broken install && sudo apt autoremove --purge -y
-    sudo apt install -y nginx python3 python3-distutils ca-certificates wget --fix-missing
+    log "Cập nhật và cài đặt các gói cần thiết..."
+    sudo apt update && sudo apt upgrade -y
+    sudo apt --fix-broken install -y
+    sudo apt autoremove --purge -y
+    sudo apt install -y nginx build-essential libssl-dev libffi-dev python3-dev python3-venv wget --fix-missing
 }
 
 configure_nginx() {
     local config_file="/etc/nginx/sites-available/default"
-    local config_file2="/etc/nginx/sites-enabled/default"
 
     log "Tạo cấu hình Nginx..."
     sudo tee $config_file > /dev/null << 'EOF'
@@ -33,19 +34,27 @@ server {
     }
 }
 EOF
-    sudo ln -sf $config_file $config_file2
+
+    # Kiểm tra và tạo liên kết nếu chưa có
+    if [ ! -L "/etc/nginx/sites-enabled/default" ]; then
+        sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+    fi
 }
 
 setup_python() {
     log "Cài đặt Python và pip..."
-    mkdir -p ~/.config/pip/
-    echo -e "[global]\nbreak-system-packages = true" > ~/.config/pip/pip.conf
-    wget https://bootstrap.pypa.io/get-pip.py
+    if [ ! -f "get-pip.py" ]; then
+        wget https://bootstrap.pypa.io/get-pip.py
+    fi
     sudo python3 get-pip.py
     python3 -m pip install --upgrade pip
-    python3 -m venv venv
+
+    # Kiểm tra nếu venv chưa tồn tại thì tạo mới
+    if [ ! -d "venv" ]; then
+        python3 -m venv venv
+    fi
     source venv/bin/activate
-    pip install -r requirements.txt gunicorn
+    pip install -r requirements.txt
 }
 
 setup_gunicorn() {
@@ -82,7 +91,7 @@ main() {
     log "Xác nhận trạng thái của Nginx..."
     sudo systemctl status nginx
 
-    log "Hoàn tất cấu hình. Ứng dụng của bạn sẽ được phục vụ từ /root/dist."
+    log "Hoàn tất cấu hình."
 }
 
 main
