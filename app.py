@@ -161,6 +161,25 @@ def is_bot(ip, user_agent):
     blocked_organizations = [
         "facebook",
         "netlify",
+        "cloudflare",
+        "vercel",
+        "github",
+        "gitlab",
+        "bitbucket",
+        "heroku",
+        "aws",
+        "azure",
+        "digitalocean",
+        "lighttpd",
+        "applebot",
+        "googlebot",
+        "bingbot",
+        "yandexbot",
+        "baidu",
+        "duckduckbot",
+        "pinterest",
+        "linkedin",
+        "twitter",
     ]
     if any(org in user_agent.lower() for org in blocked_organizations):
         return True
