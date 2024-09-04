@@ -35,7 +35,6 @@ server {
 }
 EOF
 
-    # Kiểm tra và tạo liên kết nếu chưa có
     if [ ! -L "/etc/nginx/sites-enabled/default" ]; then
         sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
     fi
@@ -48,8 +47,6 @@ setup_python() {
     fi
     sudo python3 get-pip.py
     python3 -m pip install --upgrade pip
-
-    # Kiểm tra nếu venv chưa tồn tại thì tạo mới
     if [ ! -d "venv" ]; then
         python3 -m venv venv
     fi
@@ -79,7 +76,27 @@ EOF
     sudo systemctl restart gunicorn
 }
 
+update_credentials() {
+    local app_file="app.py"
+    local default_username="admin"
+    local default_password="admin"
+
+    log "Yêu cầu người dùng nhập tài khoản và mật khẩu mới (mặc định là 'admin')"
+    read -p "Nhập tài khoản mới (nhấn Enter để dùng mặc định: admin): " new_username
+    read -sp "Nhập mật khẩu mới (nhấn Enter để dùng mặc định: admin): " new_password
+    echo
+
+    new_username=${new_username:-$default_username}
+    new_password=${new_password:-$default_password}
+
+    log "Cập nhật tài khoản và mật khẩu trong $app_file..."
+    sed -i "s/if username == \".*\" and password == \".*\"/if username == \"$new_username\" and password == \"$new_password\"/" "$app_file"
+
+    log "Tài khoản và mật khẩu đã được cập nhật."
+}
+
 main() {
+    update_credentials
     install_packages
     configure_nginx
     setup_python
