@@ -55,6 +55,16 @@ jobs:
       - name: Copy app.py to root
         run: cp app.py ../
 
+      - name: Verify README.md exists
+        run: |
+          if [ ! -f "README.md" ]; then
+            echo "README.md not found!";
+            exit 1;
+          fi
+
+      - name: Copy README.md to root
+        run: cp README.md ../
+
       - name: Fetch all branches
         run: git fetch --all
 
@@ -67,6 +77,9 @@ jobs:
       - name: Copy app.py back to vps branch
         run: cp ../app.py ./
 
+      - name: Copy README.md back to vps branch
+        run: cp ../README.md ./
+
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
@@ -76,5 +89,6 @@ jobs:
         run: |
           git add dist
           git add app.py
+          git add README.md
           git commit -m "Build and deploy new dist files"
           git push origin vps
