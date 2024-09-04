@@ -1,57 +1,80 @@
 name: Build and Deploy
 
 on:
-    push:
-        branches:
-            - frontend
-    workflow_dispatch:
+  push:
+    branches:
+      - frontend
+  workflow_dispatch:
+
 jobs:
-    build-and-deploy:
-        runs-on: ubuntu-latest
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout frontend branch
-              uses: actions/checkout@v4
-              with:
-                  ref: frontend
+    steps:
+      - name: Checkout frontend branch
+        uses: actions/checkout@v4
+        with:
+          ref: frontend
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '18'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-            - name: Install dependencies
-              run: npm install
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-            - name: Build the application
-              run: npm run build
+      - name: Install dependencies
+        run: npm install
 
-            - name: Copy dist folder to root
-              run: cp -r dist ../
+      - name: Build the application
+        run: npm run build
 
-            - name: Copy app.py to root
-              run: cp -r app.py ../
+      - name: Verify dist folder exists
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Dist folder not found!";
+            exit 1;
+          fi
 
-            - name: Fetch all branches
-              run: git fetch --all
+      - name: Copy dist folder to root
+        run: cp -r dist ../
 
-            - name: Checkout vps branch
-              run: git checkout vps
+      - name: Verify app.py exists
+        run: |
+          if [ ! -f "app.py" ]; then
+            echo "app.py not found!";
+            exit 1;
+          fi
 
-            - name: Copy dist folder back to vps branch
-              run: cp -r ../dist ./
+      - name: Copy app.py to root
+        run: cp app.py ../
 
-            - name: Copy app.py back to vps branch
-              run: cp -r ../app.py ./
+      - name: Fetch all branches
+        run: git fetch --all
 
-            - name: Configure Git
-              run: |
-                  git config --global user.name "github-actions[bot]"
-                  git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Checkout vps branch
+        run: git checkout vps
 
-            - name: Commit and push changes
-              run: |
-                  git add dist
-                  git add app.py
-                  git commit -m "Build and deploy new dist files"
-                  git push origin vps
+      - name: Copy dist folder back to vps branch
+        run: cp -r ../dist ./
+
+      - name: Copy app.py back to vps branch
+        run: cp ../app.py ./
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push changes
+        run: |
+          git add dist
+          git add app.py
+          git commit -m "Build and deploy new dist files"
+          git push origin vps
