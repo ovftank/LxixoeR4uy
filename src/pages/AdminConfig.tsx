@@ -106,7 +106,7 @@ const AdminConfig: React.FC = () => {
 	useEffect(() => {
 		const fetchConfig = async () => {
 			try {
-				const response = await axios.get<Config>('/api/admin/config');
+				const response = await axios.get<Config>(`${import.meta.env.VITE_API_URL}/api/admin/config`);
 				setConfig(response.data);
 			} catch {
 				setError('Không thể tải cấu hình');
@@ -155,7 +155,7 @@ const AdminConfig: React.FC = () => {
 		e.preventDefault();
 		try {
 			const token = localStorage.getItem('adminToken');
-			await axios.post('/api/admin/config', config, {
+			await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/config`, config, {
 				headers: { Authorization: `Bearer ${token}` },
 			});
 			setSuccess('Cập nhật cấu hình thành công');
