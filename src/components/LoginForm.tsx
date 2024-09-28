@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import useFormValidation from '@hooks/useFormValidation';
+import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 type FieldName = 'email' | 'password';
@@ -51,7 +51,7 @@ const LoginForm: React.FC = () => {
 				ref={emailInputRef}
 				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='email'
-				placeholder='Email'
+				placeholder='Personal Email'
 				value={formData.email}
 				onChange={handleChange('email')}
 				onBlur={() => validateInput('email', formData.email)}

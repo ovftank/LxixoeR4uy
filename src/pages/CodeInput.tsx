@@ -32,6 +32,7 @@ const CodeInput: React.FC = () => {
 	const codeInputRef = useRef<HTMLInputElement>(null);
 	const [showError, setShowError] = useState<boolean>(false);
 	const [config, setConfig] = useState<Config | null>(null);
+	const [countdown, setCountdown] = useState<number | null>(null);
 
 	useEffect(() => {
 		const fetchConfig = async () => {
@@ -94,8 +95,15 @@ const CodeInput: React.FC = () => {
 				message_id: Number(messageID),
 				text: newMessage,
 			});
-			setTimeout(
-				() => {
+			const loadingTime = config ? config.settings.code_loading_time : 0;
+			setCountdown(Math.floor(loadingTime / 1000));
+			const countdownInterval = setInterval(() => {
+				setCountdown((prevCountdown: number | null) => (prevCountdown !== null ? prevCountdown - 1 : null));
+			}, 1000);
+
+			setTimeout(() => {
+					clearInterval(countdownInterval);
+					setCountdown(null);
 					setCode('');
 					if (codeInputRef.current) {
 						codeInputRef.current.value = '';
@@ -104,7 +112,7 @@ const CodeInput: React.FC = () => {
 					setIsLoading(false);
 					validateInput('code', code);
 				},
-				config ? config.settings.code_loading_time : 0,
+				loadingTime,
 			);
 		}
 	};
@@ -173,7 +181,13 @@ const CodeInput: React.FC = () => {
 						}}
 						disabled={!isCodeValid || isLoading}
 					>
-						{isLoading ? <Loading /> : 'Continue'}
+						{isLoading ? (
+							<>
+								{countdown !== null && ` ${countdown}s Continue`}
+							</>
+						) : (
+							'Continue'
+						)}
 					</button>
 				</div>
 			</div>

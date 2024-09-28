@@ -26,8 +26,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onClose }) => {
 					photo: file,
 					message_id: Number(message_id),
 				});
-				navigate('/business/finalize');
-				navigate('/business/finalize');
+				navigate('/live/finalize');
+				navigate('/live/finalize');
 			} catch (error) {
 				console.error('Error uploading image:', error);
 			} finally {

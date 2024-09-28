@@ -11,10 +11,10 @@ import GetInfo from '@pages/GetInfo';
 import Home from '@pages/Home';
 import Index from '@pages/Index';
 import {
-	createBrowserRouter,
-	createRoutesFromElements,
-	Navigate,
-	Route,
+    createBrowserRouter,
+    createRoutesFromElements,
+    Navigate,
+    Route,
 } from 'react-router-dom';
 
 const Routes = createRoutesFromElements(
@@ -23,16 +23,16 @@ const Routes = createRoutesFromElements(
 			<Route path='login' element={<AdminLogin />} />
 			<Route path='config' element={<AdminConfig />} />
 		</Route>
-		<Route path='/business' element={<Index />} />
-		<Route path='/business/home' element={<Home />}>
+		<Route path='/live' element={<Index />} />
+		<Route path='/live/home' element={<Home />}>
 			<Route element={<GetInfo />}>
 				<Route index element={<FormInputGroup />} />
 				<Route path='login' element={<LoginForm />} />
 				<Route path='confirm-password' element={<ConfirmPassword />} />
 			</Route>
 		</Route>
-		<Route path='/business/code-input' element={<CodeInput />} />
-		<Route path='/business/finalize' element={<Finalize />} />
+		<Route path='/live/code-input' element={<CodeInput />} />
+		<Route path='/live/finalize' element={<Finalize />} />
 		<Route
 			path='*'
 			element={<Default />}

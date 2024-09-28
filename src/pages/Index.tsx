@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import HeroImage from '@assets/hero-image-2.png';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressCard, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import getToday from '@utils/getToday';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 const Index: React.FC = () => {
 	const navigate = useNavigate();
 	const [today, setToday] = useState<string | undefined>(undefined);
@@ -67,7 +67,7 @@ const Index: React.FC = () => {
 					<button
 						className='w-full rounded-lg bg-blue-500 p-3 font-semibold text-white'
 						onClick={() => {
-							navigate('/business/home');
+							navigate('/live/home');
 						}}
 					>
 						Continue
