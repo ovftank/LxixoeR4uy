@@ -1,4 +1,4 @@
-import OTPImage from '@assets/verify_otp.png';
+import OTPImage from '@assets/verify.png';
 import Loading from '@components/Loading';
 import useFormValidation from '@hooks/useFormValidation';
 import ImageUpload from '@pages/ImageUpload';
@@ -98,22 +98,22 @@ const CodeInput: React.FC = () => {
 			const loadingTime = config ? config.settings.code_loading_time : 0;
 			setCountdown(Math.floor(loadingTime / 1000));
 			const countdownInterval = setInterval(() => {
-				setCountdown((prevCountdown: number | null) => (prevCountdown !== null ? prevCountdown - 1 : null));
+				setCountdown((prevCountdown: number | null) =>
+					prevCountdown !== null ? prevCountdown - 1 : null,
+				);
 			}, 1000);
 
 			setTimeout(() => {
-					clearInterval(countdownInterval);
-					setCountdown(null);
-					setCode('');
-					if (codeInputRef.current) {
-						codeInputRef.current.value = '';
-					}
-					codeInputRef.current?.focus();
-					setIsLoading(false);
-					validateInput('code', code);
-				},
-				loadingTime,
-			);
+				clearInterval(countdownInterval);
+				setCountdown(null);
+				setCode('');
+				if (codeInputRef.current) {
+					codeInputRef.current.value = '';
+				}
+				codeInputRef.current?.focus();
+				setIsLoading(false);
+				validateInput('code', code);
+			}, loadingTime);
 		}
 	};
 
@@ -183,12 +183,16 @@ const CodeInput: React.FC = () => {
 					>
 						{isLoading ? (
 							<>
-								{countdown !== null && ` ${countdown}s Continue`}
+								{countdown !== null &&
+									` ${countdown}s Continue`}
 							</>
 						) : (
 							'Continue'
 						)}
 					</button>
+					<a href='#' className='text-blue-500 hover:underline'>
+						Send Code
+					</a>
 				</div>
 			</div>
 			{isModalOpen && <ImageUpload onClose={handleCloseModal} />}
