@@ -5,10 +5,11 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"build": "tsc -b && vite build && node build.js",
 		"format": "prettier --config .prettierrc --write .",
 		"lint": "eslint .",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"encode": "tsx build.ts"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -17,11 +18,13 @@
 		"@tabler/icons-react": "^3.14.0",
 		"axios": "^1.7.4",
 		"framer-motion": "^11.4.0",
+		"jscrewit": "^2.37.0",
 		"postcss-load-config": "^6.0.1",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-phone-input-2": "^2.15.1",
-		"react-router-dom": "^6.26.1"
+		"react-router-dom": "^6.26.1",
+		"tsx": "^4.19.1"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.9.0",

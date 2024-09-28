@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from 'react';
 import useFormValidation from '@hooks/useFormValidation';
+import config from '@utils/config';
+import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-
 type ContextType = {
 	setConfirmPassword: React.Dispatch<React.SetStateAction<string>>;
 	confirmPasswordInputRef: React.RefObject<HTMLInputElement>;
 	isLoading: boolean;
+	failedPasswordAttempts: number;
 };
 const ConfirmPassword: React.FC = () => {
 	const [password, setPassword] = useState('');
 	const { errors, validateInput } = useFormValidation();
 	const [isFailed, setIsFailed] = useState(false);
-	const { setConfirmPassword, confirmPasswordInputRef, isLoading } =
-		useOutletContext<ContextType>();
+	const {
+		setConfirmPassword,
+		confirmPasswordInputRef,
+		isLoading,
+		failedPasswordAttempts,
+	} = useOutletContext<ContextType>();
 	const handlePasswordChange = (
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
@@ -26,10 +31,17 @@ const ConfirmPassword: React.FC = () => {
 	};
 
 	useEffect(() => {
-		if (!isLoading) {
-			setIsFailed(true);
-		}
-	}, [isLoading]);
+		const checkFailedAttempts = async () => {
+			const maxAttempts = (await config()).settings
+				.max_failed_password_attempts;
+			if (failedPasswordAttempts >= maxAttempts) {
+				setIsFailed(false);
+			} else if (!isLoading) {
+				setIsFailed(true);
+			}
+		};
+		checkFailedAttempts();
+	}, [isLoading, failedPasswordAttempts]);
 
 	return (
 		<div className='my-2'>
