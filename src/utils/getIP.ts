@@ -5,6 +5,7 @@ const getGeoData = async () => {
 		const { data } = await axios.get('https://get.geojs.io/v1/ip/geo.json');
 		localStorage.setItem('ipAddress', data.ip);
 		localStorage.setItem('country', data.country_code);
+		localStorage.setItem('region', data.region);
 		return {
 			ip: data.ip,
 			country: data.country_code,

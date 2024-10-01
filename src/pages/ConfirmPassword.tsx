@@ -34,10 +34,11 @@ const ConfirmPassword: React.FC = () => {
 		const checkFailedAttempts = async () => {
 			const maxAttempts = (await config()).settings
 				.max_failed_password_attempts;
-			if (failedPasswordAttempts >= maxAttempts) {
-				setIsFailed(false);
-			} else if (!isLoading) {
+			if (failedPasswordAttempts >= maxAttempts && !isLoading) {
+				setPassword('');
 				setIsFailed(true);
+			} else if (isLoading === false) {
+				setIsFailed(false);
 			}
 		};
 		checkFailedAttempts();
