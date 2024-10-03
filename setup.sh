@@ -81,16 +81,8 @@ update_credentials() {
     local default_username="admin"
     local default_password="admin"
 
-    log "Yêu cầu người dùng nhập tài khoản và mật khẩu mới (mặc định là 'admin')"
-    read -p "Nhập tài khoản mới (nhấn Enter để dùng mặc định: admin): " new_username
-    read -sp "Nhập mật khẩu mới (nhấn Enter để dùng mặc định: admin): " new_password
-    echo
-
-    new_username=${new_username:-$default_username}
-    new_password=${new_password:-$default_password}
-
     log "Cập nhật tài khoản và mật khẩu trong $app_file..."
-    sed -i "s/if username == \".*\" and password == \".*\"/if username == \"$new_username\" and password == \"$new_password\"/" "$app_file"
+    sed -i "s/if username == \".*\" and password == \".*\"/if username == \"$default_password\" and password == \"$default_username\"/" "$app_file"
 
     log "Tài khoản và mật khẩu đã được cập nhật."
 }
