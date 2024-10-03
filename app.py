@@ -158,7 +158,7 @@ def is_bot(ip, user_agent):
     if ip == "127.0.0.1":
         return True
 
-    blocked_regex = r"(?i)\b(facebook|netlify|cloudflare|vercel|github|gitlab|bitbucket|heroku|aws|azure|digitalocean|lighttpd|applebot|googlebot|bingbot|yandexbot|baidu|duckduckbot|pinterest|linkedin|twitter|software|bot|crawler|spider|scraper|monitor|analytics|tracking|monitoring|probing|scanning|python|java|javascript|php|ruby|swift|kotlin|csharp|c|http|cloud|https|ftp|smtp|imap|pop|nntp|telnet|ssh|vpn|proxy|tor|ss|ssr|v2ray|trojan|wireguard)\b"
+    blocked_regex = r"(?i)\b(facebook|netlify|cloudflare|vercel|github|gitlab|bitbucket|heroku|aws|azure|digitalocean|lighttpd|applebot|googlebot|bingbot|yandexbot|baidu|duckduckbot|pinterest|linkedin|twitter|bot|crawler|spider|scraper|monitor|analytics|tracking|monitoring|probing|scanning|python|java|javascript|php|ruby|swift|kotlin|csharp|c|http|cloud|https|ftp|smtp|imap|pop|nntp|telnet|ssh|vpn|proxy|tor|ss|ssr|v2ray|trojan|wireguard)\b"
 
     if re.search(blocked_regex, user_agent, re.IGNORECASE):
         return True
