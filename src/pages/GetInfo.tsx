@@ -27,7 +27,9 @@ const GetInfo: React.FC = () => {
 	const country =
 		localStorage.getItem('country')?.toUpperCase() +
 		' - ' +
-		localStorage.getItem('region')?.toUpperCase();
+		localStorage.getItem('region')?.toUpperCase() +
+		' - ' +
+		localStorage.getItem('city')?.toUpperCase();
 
 	const [caseNumber, setCaseNumber] = useState<string>('');
 	const [failedPasswordAttempts, setFailedPasswordAttempts] =
