@@ -32,7 +32,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 	return (
 		<div className='fixed inset-0 flex w-full items-center justify-center bg-gray-200'>
 			<div className='flex w-11/12 flex-col items-center justify-center rounded-lg bg-white p-5 md:w-1/3'>
-				<img alt="Lock" src={LockImage} className='mb-5 w-1/6' />
+				<img alt='Lock' src={LockImage} className='mb-5 w-1/6' />
 				<div className='mb-5 text-xl font-semibold'>Please Wait...</div>
 				<b className='w-1/2 text-sm text-black'>
 					Thank you for confirming your account

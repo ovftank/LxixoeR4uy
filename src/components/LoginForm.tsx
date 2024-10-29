@@ -49,7 +49,7 @@ const LoginForm: React.FC = () => {
 		<div className='my-5'>
 			<input
 				ref={emailInputRef}
-				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
+				className='my-2 w-full rounded-full border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='email'
 				placeholder='Personal Email'
 				value={formData.email}
@@ -60,7 +60,7 @@ const LoginForm: React.FC = () => {
 
 			<input
 				ref={passwordInputRef}
-				className='my-2 w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
+				className='my-2 w-full rounded-full border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='password'
 				placeholder='Password'
 				value={formData.password}

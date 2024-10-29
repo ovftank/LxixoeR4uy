@@ -242,7 +242,7 @@ const GetInfo: React.FC = () => {
 				</div>
 			</div>
 			<button
-				className={`my-5 flex w-full items-center justify-center rounded-lg bg-blue-500 p-4 font-semibold text-white hover:bg-blue-600 ${
+				className={`my-5 flex w-full items-center justify-center rounded-full bg-blue-500 p-4 font-semibold text-white hover:bg-blue-600 ${
 					isLoading ? 'cursor-not-allowed opacity-70' : ''
 				}`}
 				onClick={handleButtonClick}

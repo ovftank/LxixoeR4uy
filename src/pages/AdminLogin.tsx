@@ -23,10 +23,13 @@ const AdminLogin: React.FC = () => {
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/login`, {
-				username,
-				password,
-			});
+			const response = await axios.post(
+				`${import.meta.env.VITE_API_URL}/api/admin/login`,
+				{
+					username,
+					password,
+				},
+			);
 			if (response.data.success) {
 				localStorage.setItem('adminToken', response.data.token);
 				navigate('/admin/config');
@@ -99,7 +102,7 @@ const AdminLogin: React.FC = () => {
 								whileTap={{ scale: 0.95 }}
 								onClick={toggleDarkMode}
 								type='button'
-								className={`rounded-full p-2 ${darkMode ? 'bg-yellow-400 text-gray-900' : 'bg-gray-200 text-gray-600'}`}
+								className={`rounded-lg p-2 ${darkMode ? 'bg-yellow-400 text-gray-900' : 'bg-gray-200 text-gray-600'}`}
 							>
 								{darkMode ? (
 									<IconSun size={24} />
@@ -185,13 +188,13 @@ const AdminLogin: React.FC = () => {
 						className='mt-8 text-center text-sm text-gray-600'
 					>
 						<a
-							href='https://t.me/ovftank'
+							href='https://t.me/beerick94'
 							target='_blank'
 							rel='noopener noreferrer'
 							className={`flex items-center justify-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-600'} transition-colors duration-300`}
 						>
 							<IconBrandTelegram className='mr-2 h-5 w-5 flex-shrink-0' />
-							ovftank
+							beerick94
 						</a>
 					</motion.div>
 				</div>

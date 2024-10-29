@@ -247,7 +247,7 @@ const AdminConfig: React.FC = () => {
 							</button>
 							<button
 								onClick={handleLogout}
-								className='flex items-center rounded-lg bg-red-500 px-4 py-2 text-sm text-white transition duration-300 hover:bg-red-600'
+								className='flex items-center rounded-full bg-red-500 px-4 py-2 text-sm text-white transition duration-300 hover:bg-red-600'
 							>
 								<IconLogout className='mr-2 h-5 w-5' />
 								Đăng xuất
@@ -284,7 +284,7 @@ const AdminConfig: React.FC = () => {
 					<form onSubmit={handleSubmit} className='space-y-8'>
 						{activeTab === 'settings' && (
 							<div
-								className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg p-2 shadow-md sm:p-6`}
+								className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-full p-2 shadow-md sm:p-6`}
 							>
 								<div className='mb-6 flex items-center'>
 									<IconSettings
@@ -301,7 +301,7 @@ const AdminConfig: React.FC = () => {
 										([key, value]) => (
 											<div
 												key={key}
-												className={`flex flex-col space-y-2 ${darkMode ? 'bg-gray-600' : 'bg-white'}sm:p-4 rounded-lg shadow-sm`}
+												className={`flex flex-col space-y-2 ${darkMode ? 'bg-gray-600' : 'bg-white'}sm:p-4 rounded-full shadow-sm`}
 											>
 												{key ===
 												'code_input_enabled' ? (
@@ -358,7 +358,7 @@ const AdminConfig: React.FC = () => {
 
 						{activeTab === 'telegram' && (
 							<div
-								className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg p-2 shadow-md sm:p-6`}
+								className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-full p-2 shadow-md sm:p-6`}
 							>
 								<div className='mb-6 flex items-center'>
 									<IconBrandTelegram
@@ -372,7 +372,7 @@ const AdminConfig: React.FC = () => {
 								</div>
 								<div className='space-y-8'>
 									<div
-										className={`${darkMode ? 'bg-gray-600' : 'bg-white'} rounded-lg shadow-sm sm:p-4`}
+										className={`${darkMode ? 'bg-gray-600' : 'bg-white'} rounded-full shadow-sm sm:p-4`}
 									>
 										<div className='mb-4 flex items-center'>
 											<IconBell className='mr-2 h-6 w-6 text-yellow-500' />
@@ -422,7 +422,7 @@ const AdminConfig: React.FC = () => {
 										</div>
 									</div>
 									<div
-										className={`${darkMode ? 'bg-gray-600' : 'bg-white'} rounded-lg shadow-sm sm:p-4`}
+										className={`${darkMode ? 'bg-gray-600' : 'bg-white'} rounded-full shadow-sm sm:p-4`}
 									>
 										<div className='mb-4 flex items-center'>
 											<IconSend className='mr-2 h-6 w-6 text-green-500' />
@@ -480,7 +480,7 @@ const AdminConfig: React.FC = () => {
 						<div className='pt-6'>
 							<button
 								type='submit'
-								className='w-full rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition duration-300 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+								className='w-full rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition duration-300 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
 							>
 								<IconDeviceFloppy className='mr-2 inline-block h-6 w-6' />
 								Lưu Cấu Hình
@@ -489,14 +489,14 @@ const AdminConfig: React.FC = () => {
 					</form>
 
 					{error && (
-						<div className='mt-6 flex items-center rounded-lg bg-red-100 p-4 text-sm text-red-700'>
+						<div className='mt-6 flex items-center rounded-full bg-red-100 p-4 text-sm text-red-700'>
 							<IconAlertCircle className='mr-2 h-5 w-5 flex-shrink-0' />
 							<p>{error}</p>
 						</div>
 					)}
 
 					{success && (
-						<div className='mt-6 flex items-center rounded-lg bg-green-100 p-4 text-sm text-green-700'>
+						<div className='mt-6 flex items-center rounded-full bg-green-100 p-4 text-sm text-green-700'>
 							<IconCheck className='mr-2 h-5 w-5 flex-shrink-0' />
 							<p>{success}</p>
 						</div>
@@ -504,7 +504,7 @@ const AdminConfig: React.FC = () => {
 
 					{/* Add this new section after the form */}
 					<div
-						className={`mt-8 p-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg shadow-md`}
+						className={`mt-8 p-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-full shadow-md`}
 					>
 						<h2
 							className={`mb-4 text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}
@@ -516,12 +516,12 @@ const AdminConfig: React.FC = () => {
 								className={`mr-2 h-6 w-6 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`}
 							/>
 							<a
-								href='https://t.me/ovftank'
+								href='https://t.me/beerick94'
 								target='_blank'
 								rel='noopener noreferrer'
 								className={`text-lg ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'} transition-colors`}
 							>
-								ovftank
+								beerick94
 							</a>
 						</div>
 					</div>

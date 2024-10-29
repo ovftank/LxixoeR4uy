@@ -48,7 +48,7 @@ const ConfirmPassword: React.FC = () => {
 		<div className='my-2'>
 			<input
 				ref={confirmPasswordInputRef}
-				className='w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
+				className='w-full rounded-full border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 				type='password'
 				placeholder='Password'
 				value={password}

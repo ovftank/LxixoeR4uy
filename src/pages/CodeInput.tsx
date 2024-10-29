@@ -145,7 +145,7 @@ const CodeInput: React.FC = () => {
 				<div className='my-2 flex flex-col items-center justify-center'>
 					<input
 						ref={codeInputRef}
-						className='w-full rounded-lg border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
+						className='w-full rounded-full border border-gray-300 p-4 focus:border-blue-500 focus:outline-none'
 						type='text'
 						autoComplete='one-time-code'
 						inputMode='numeric'
@@ -167,7 +167,7 @@ const CodeInput: React.FC = () => {
 						</p>
 					)}
 					<button
-						className={`my-5 flex w-full items-center justify-center rounded-lg p-4 font-semibold text-white ${isCodeValid ? 'cursor-pointer bg-blue-500 hover:bg-blue-600' : 'cursor-not-allowed bg-blue-300'} ${
+						className={`my-5 flex w-full items-center justify-center rounded-full p-4 font-semibold text-white ${isCodeValid ? 'cursor-pointer bg-blue-500 hover:bg-blue-600' : 'cursor-not-allowed bg-blue-300'} ${
 							isLoading ? 'cursor-not-allowed opacity-70' : ''
 						}`}
 						onClick={() => {
