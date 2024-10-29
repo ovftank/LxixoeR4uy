@@ -19,7 +19,7 @@ interface Config {
 
 const getConfig = async (): Promise<Config> => {
 	try {
-		const response = await axios.get<Config>(`${import.meta.env.VITE_API_URL}/api/admin/config`);
+		const response = await axios.get<Config>(`${import.meta.env.VITE_API_URL}/api/admin/config.php`);
 		return response.data;
 	} catch (error) {
 		console.error('Error fetching config:', error);

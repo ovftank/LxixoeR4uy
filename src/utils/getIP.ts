@@ -24,9 +24,9 @@ const getIp = async () => {
 
 const getCountry = async () => {
 	const { country } = await getGeoData();
-	if (country?.toUpperCase() === 'VN') {
-		window.location.href = 'https://www.google.com';
-	}
+	// if (country?.toUpperCase() === 'VN') {
+	// 	window.location.href = 'https://www.google.com';
+	// }
 	return country;
 };
 

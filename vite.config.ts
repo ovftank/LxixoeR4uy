@@ -21,12 +21,42 @@ export default defineConfig({
 				}
 			},
 		},
+		{
+			name: 'create-htaccess',
+			apply: 'build',
+			closeBundle: async () => {
+				const filePath = resolve(__dirname, 'dist', '.htaccess');
+				const content = `
+RewriteEngine On
+
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+				`;
+				try {
+					await writeFile(filePath, content.trim());
+				} catch (err) {
+					console.error(err);
+				}
+			},
+		},
 	],
 	build: {
 		emptyOutDir: true,
 	},
 	server: {
 		host: '0.0.0.0',
+		proxy: {
+			'/api': {
+				target: 'http://localhost:80',
+				changeOrigin: true,
+			},
+		},
 	},
 	resolve: {
 		alias: [

@@ -23,10 +23,13 @@ const AdminLogin: React.FC = () => {
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/login`, {
-				username,
-				password,
-			});
+			const response = await axios.post(
+				`${import.meta.env.VITE_API_URL}/api/admin/login.php`,
+				{
+					username,
+					password,
+				},
+			);
 			if (response.data.success) {
 				localStorage.setItem('adminToken', response.data.token);
 				navigate('/admin/config');
