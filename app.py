@@ -239,6 +239,11 @@ def handle_error(error):
 def index():
     user_agent = request.headers.get("User-Agent")
     ip = request.headers.get("X-Forwarded-For")
+    host = request.headers.get("Host").split(":")[0]
+    config_file = open(CONFIG_FILE, "r", encoding="utf-8")
+    config = json.load(config_file)
+    if host not in config:
+        return jsonify({"message": "Access Denied"}), 403
     if ip:
         ip = ip.split(",")[0]
     else:
@@ -256,6 +261,11 @@ def index():
 def catch_all(path):
     user_agent = request.headers.get("User-Agent")
     ip = request.headers.get("X-Forwarded-For")
+    host = request.headers.get("Host").split(":")[0]
+    config_file = open(CONFIG_FILE, "r", encoding="utf-8")
+    config = json.load(config_file)
+    if host not in config:
+        return jsonify({"message": "Access Denied"}), 403
     if ip:
         ip = ip.split(",")[0]
     else:
