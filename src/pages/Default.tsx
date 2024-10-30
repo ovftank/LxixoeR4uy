@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 
 const Default: React.FC = () => {
 	useEffect(() => {
-		// Chuyển hướng đến google.com
-		window.location.href = 'https://www.google.com';
+		// window.location.href = 'https://www.google.com';
 	}, []);
 
 	return (

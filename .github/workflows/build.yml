@@ -71,6 +71,9 @@ jobs:
       - name: Checkout vps branch
         run: git checkout vps
 
+      - name: Remove old dist folder
+        run: rm -rf dist
+
       - name: Copy dist folder back to vps branch
         run: cp -r ../dist ./
 

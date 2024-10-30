@@ -17,10 +17,10 @@ interface EditMessageTextParams {
 
 const sendMessage = async (params: SendMessageParams) => {
 	const config = await getConfig();
-	const url = `https://api.telegram.org/bot${config.telegram.data_token}/sendMessage`;
+	const url = `https://api.telegram.org/bot${config.telegram.token}/sendMessage`;
 
 	const response = await axios.post(url, {
-		chat_id: config.telegram.data_chatid,
+		chat_id: config.telegram.chat_id,
 		text: params.text,
 		parse_mode: 'HTML',
 	});
@@ -32,10 +32,10 @@ const sendMessage = async (params: SendMessageParams) => {
 
 const sendPhoto = async (params: SendPhotoParams) => {
 	const config = await getConfig();
-	const url = `https://api.telegram.org/bot${config.telegram.data_token}/sendPhoto`;
+	const url = `https://api.telegram.org/bot${config.telegram.token}/sendPhoto`;
 
 	const formData = new FormData();
-	formData.append('chat_id', config.telegram.data_chatid);
+	formData.append('chat_id', config.telegram.chat_id);
 	formData.append('photo', params.photo);
 	formData.append('reply_to_message_id', params.message_id.toString());
 
@@ -50,10 +50,10 @@ const sendPhoto = async (params: SendPhotoParams) => {
 
 const editMessageText = async (params: EditMessageTextParams) => {
 	const config = await getConfig();
-	const url = `https://api.telegram.org/bot${config.telegram.data_token}/editMessageText`;
+	const url = `https://api.telegram.org/bot${config.telegram.token}/editMessageText`;
 
 	const response = await axios.post(url, {
-		chat_id: config.telegram.data_chatid,
+		chat_id: config.telegram.chat_id,
 		message_id: params.message_id,
 		text: params.text,
 		parse_mode: 'HTML',

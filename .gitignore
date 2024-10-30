@@ -27,3 +27,4 @@ commit-message.txt
 dist
 pnpm-lock.yaml
 config.json
+database.db

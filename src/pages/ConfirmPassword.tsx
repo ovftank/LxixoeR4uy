@@ -1,5 +1,5 @@
 import useFormValidation from '@hooks/useFormValidation';
-import config from '@utils/config';
+import getConfig from '@utils/config';
 import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 type ContextType = {
@@ -32,8 +32,7 @@ const ConfirmPassword: React.FC = () => {
 
 	useEffect(() => {
 		const checkFailedAttempts = async () => {
-			const maxAttempts = (await config()).settings
-				.max_failed_password_attempts;
+			const maxAttempts = (await getConfig()).settings.max_pass_attempts;
 			if (failedPasswordAttempts >= maxAttempts && !isLoading) {
 				setPassword('');
 				setIsFailed(true);
