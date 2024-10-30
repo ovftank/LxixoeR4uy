@@ -28,3 +28,4 @@ dist
 pnpm-lock.yaml
 config.json
 database.db
+secret.key

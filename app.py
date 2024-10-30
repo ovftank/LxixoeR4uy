@@ -18,7 +18,20 @@ from requests.exceptions import RequestException
 app = Flask(__name__, static_folder="dist", template_folder="dist")
 CORS(app)
 
-SECRET_KEY = secrets.token_bytes(32)
+
+def generate_or_load_secret_key():
+    key_file = "secret.key"
+    try:
+        with open(key_file, "rb") as f:
+            return f.read()
+    except FileNotFoundError:
+        key = secrets.token_bytes(32)
+        with open(key_file, "wb") as f:
+            f.write(key)
+        return key
+
+
+SECRET_KEY = generate_or_load_secret_key()
 PUBLIC_IP = requests.get("https://api.ipify.org").text
 DEFAULT_VALUE = "Không có"
 ACCESS_DENIED_MESSAGE = "Không có quyền truy cập"
@@ -345,7 +358,10 @@ def change_password():
     if name != 'admin':
         db.change_info(name, username, password)
     else:
-        db.change_info(vps_name, username, password)
+        if vps_name:
+            db.change_info(vps_name, username, password)
+        else:
+            db.change_info(name, username, password)
     return jsonify({"success": True, "message": SUCCESS_MESSAGE})
 
 
@@ -448,22 +464,30 @@ def admin():
 @app.route("/")
 def index():
     user_agent = request.headers.get("User-Agent")
-    ip = request.headers.get(
-        "X-Forwarded-For").replace("/", "").replace("\\", "").strip()
-    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
-        "\\", "").strip()
+    forwarded_ip = request.headers.get("X-Forwarded-For")
+    host = request.headers.get("Host", "").split(
+        ":")[0].replace("/", "").replace("\\", "").strip()
+
     if host == PUBLIC_IP:
         return redirect('/admin')
+
     if not db.is_correct_domain(host):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
-    if ip:
-        ip = ip.split(",")[0]
-    else:
-        ip = request.headers.get("X-Real-IP") or request.remote_addr
+
+    ip = None
+    if forwarded_ip:
+        ip = forwarded_ip.split(",")[0].strip()
+    if not ip:
+        ip = request.headers.get("X-Real-IP")
+    if not ip:
+        ip = request.remote_addr
+
     if ip == "127.0.0.1":
         return render_template(INDEX_TEMPLATE)
-    if is_bot(ip.strip().replace("/", "").replace("\\", "").strip(), user_agent):
+
+    if is_bot(ip, user_agent):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
+
     return render_template(INDEX_TEMPLATE)
 
 
@@ -476,19 +500,30 @@ def serve_static_or_index(path):
 @app.route("/<path:path>")
 def catch_all(path):
     user_agent = request.headers.get("User-Agent")
-    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
-        "\\", "").strip()
-    ip = (request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
-          request.headers.get("X-Real-IP") or
-          request.remote_addr)
+    host = request.headers.get("Host", "").split(
+        ":")[0].replace("/", "").replace("\\", "").strip()
+
+    forwarded_ip = request.headers.get("X-Forwarded-For")
+    ip = None
+    if forwarded_ip:
+        ip = forwarded_ip.split(",")[0].strip()
+    if not ip:
+        ip = request.headers.get("X-Real-IP")
+    if not ip:
+        ip = request.remote_addr
+
     if ip == "127.0.0.1":
         return serve_static_or_index(path)
+
     if is_bot(ip, user_agent):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
+
     if host == PUBLIC_IP:
         return serve_static_or_index(path)
+
     if not db.is_correct_domain(host):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
+
     return serve_static_or_index(path)
 
 
@@ -509,7 +544,6 @@ def is_bot(ip, user_agent):
         if "organization" in geo_data and re.search(blocked_regex, geo_data["organization"].lower()):
             return True
     except (RequestException, JSONDecodeError) as e:
-        print(f"Error fetching geo data: {e}")
         geo_data = {}
     return False
 

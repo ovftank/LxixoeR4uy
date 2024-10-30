@@ -196,8 +196,6 @@ const BestAdmin = () => {
 				{ username: myUsername, password: myPassword },
 				{ headers: { Authorization: `Bearer ${token}` } },
 			);
-			setMyUsername('');
-			setMyPassword('');
 		} catch (error) {
 			console.error('Failed to change info:', error);
 		}
@@ -388,8 +386,8 @@ const BestAdmin = () => {
 									disabled={vpsCount >= 35}
 									className={`inline-flex items-center rounded-lg px-6 py-2.5 text-sm font-medium transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 ${
 										vpsCount >= 35
-											? 'cursor-not-allowed bg-gray-400'
-											: 'bg-gray-600 hover:bg-gray-700'
+											? 'cursor-not-allowed bg-gray-400 text-white'
+											: 'bg-gray-600 text-white hover:bg-gray-700'
 									}`}
 								>
 									<FontAwesomeIcon
@@ -609,27 +607,33 @@ const BestAdmin = () => {
 								<label className='mb-1 block text-sm font-medium text-gray-700'>
 									Mật Khẩu
 								</label>
-								<input
-									type={showMyPassword ? 'text' : 'password'}
-									value={myPassword}
-									onChange={(e) =>
-										setMyPassword(e.target.value)
-									}
-									className='w-full rounded-lg border-gray-400 px-4 py-2.5 text-sm transition-colors duration-200 ease-in-out placeholder:text-gray-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2'
-								/>
-								<button
-									type='button'
-									onClick={() =>
-										setShowMyPassword(!showMyPassword)
-									}
-									className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900'
-								>
-									<FontAwesomeIcon
-										icon={
-											showMyPassword ? faEyeSlash : faEye
+								<div className='relative'>
+									<input
+										type={
+											showMyPassword ? 'text' : 'password'
 										}
+										value={myPassword}
+										onChange={(e) =>
+											setMyPassword(e.target.value)
+										}
+										className='w-full rounded-lg border-gray-400 px-4 py-2.5 text-sm transition-colors duration-200 ease-in-out placeholder:text-gray-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2'
 									/>
-								</button>
+									<button
+										type='button'
+										onClick={() =>
+											setShowMyPassword(!showMyPassword)
+										}
+										className='absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-600 hover:text-gray-900'
+									>
+										<FontAwesomeIcon
+											icon={
+												showMyPassword
+													? faEyeSlash
+													: faEye
+											}
+										/>
+									</button>
+								</div>
 							</div>
 							<button
 								onClick={handleChangeMyInfo}
@@ -673,38 +677,40 @@ const BestAdmin = () => {
 									<label className='mb-1 block text-sm font-medium text-gray-700'>
 										Mật Khẩu
 									</label>
-									<input
-										type={
-											showEditPassword
-												? 'text'
-												: 'password'
-										}
-										value={editUser.password}
-										onChange={(e) =>
-											setEditUser({
-												...editUser,
-												password: e.target.value,
-											})
-										}
-										className='w-full rounded-lg border-gray-400 px-4 py-2.5 text-sm transition-colors duration-200 ease-in-out placeholder:text-gray-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2'
-									/>
-									<button
-										type='button'
-										onClick={() =>
-											setShowEditPassword(
-												!showEditPassword,
-											)
-										}
-										className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900'
-									>
-										<FontAwesomeIcon
-											icon={
+									<div className='relative'>
+										<input
+											type={
 												showEditPassword
-													? faEyeSlash
-													: faEye
+													? 'text'
+													: 'password'
 											}
+											value={editUser.password}
+											onChange={(e) =>
+												setEditUser({
+													...editUser,
+													password: e.target.value,
+												})
+											}
+											className='w-full rounded-lg border-gray-400 px-4 py-2.5 text-sm transition-colors duration-200 ease-in-out placeholder:text-gray-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2'
 										/>
-									</button>
+										<button
+											type='button'
+											onClick={() =>
+												setShowEditPassword(
+													!showEditPassword,
+												)
+											}
+											className='absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-600 hover:text-gray-900'
+										>
+											<FontAwesomeIcon
+												icon={
+													showEditPassword
+														? faEyeSlash
+														: faEye
+												}
+											/>
+										</button>
+									</div>
 								</div>
 								<div className='flex justify-end space-x-4'>
 									<button
