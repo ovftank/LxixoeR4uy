@@ -19,7 +19,7 @@ app = Flask(__name__, static_folder="dist", template_folder="dist")
 CORS(app)
 
 SECRET_KEY = secrets.token_bytes(32)
-PUBLIC_IP = 'localhost'  # requests.get("https://api.ipify.org").text
+PUBLIC_IP = requests.get("https://api.ipify.org").text
 DEFAULT_VALUE = "Không có"
 ACCESS_DENIED_MESSAGE = "Không có quyền truy cập"
 SUCCESS_MESSAGE = "Thành công"
