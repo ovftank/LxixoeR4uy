@@ -32,7 +32,7 @@ def generate_or_load_secret_key():
 
 
 SECRET_KEY = generate_or_load_secret_key()
-PUBLIC_IP = requests.get("https://api.ipify.org").text
+PUBLIC_IP = "localhost"  # requests.get("https://api.ipify.org").text
 DEFAULT_VALUE = "Không có"
 ACCESS_DENIED_MESSAGE = "Không có quyền truy cập"
 SUCCESS_MESSAGE = "Thành công"
