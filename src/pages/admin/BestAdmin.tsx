@@ -149,6 +149,14 @@ const BestAdmin = () => {
 			return;
 		}
 
+		if (vpsCount >= 35) {
+			setToast(
+				'Không đủ VPS để khởi tạo, vui lòng xoá hoặc mua thêm VPS',
+			);
+			window.open('https://ovfteam.com/', '_blank');
+			return;
+		}
+
 		try {
 			await axios.post(
 				'/api/admin/add-user',
@@ -377,7 +385,12 @@ const BestAdmin = () => {
 								/>
 								<button
 									onClick={handleAddUser}
-									className='inline-flex items-center rounded-lg bg-gray-600 px-6 py-2.5 text-sm font-medium text-white transition-colors duration-200 ease-in-out hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2'
+									disabled={vpsCount >= 35}
+									className={`inline-flex items-center rounded-lg px-6 py-2.5 text-sm font-medium transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 ${
+										vpsCount >= 35
+											? 'cursor-not-allowed bg-gray-400'
+											: 'bg-gray-600 hover:bg-gray-700'
+									}`}
 								>
 									<FontAwesomeIcon
 										icon={faPlus}
