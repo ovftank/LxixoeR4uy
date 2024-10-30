@@ -204,7 +204,8 @@ def token_required(f):
 
 @app.route("/api/admin/login", methods=["POST"])
 def login():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     data = request.get_json()
@@ -220,7 +221,8 @@ def login():
 
 @app.route("/api/admin/config", methods=["GET"])
 def get_config():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         if not db.is_correct_domain(host):
             return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
@@ -243,7 +245,8 @@ def get_config():
 @app.route("/api/admin/telegram", methods=["POST"])
 @token_required
 def get_telegram_config():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     data = request.get_json()
     chat_id = data.get("chat_id")
     telegram_token = data.get("token")
@@ -259,7 +262,8 @@ def get_telegram_config():
 @app.route("/api/admin/config", methods=["POST"])
 @token_required
 def update_config():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     try:
@@ -281,7 +285,8 @@ def update_config():
 @app.route('/api/admin/domains', methods=['GET'])
 @token_required
 def get_domains():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     token = request.headers.get("Authorization")
@@ -293,7 +298,8 @@ def get_domains():
 @app.route('/api/admin/add-domain', methods=['POST'])
 @token_required
 def add_domain():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     domain = request.get_json().get("domain")
@@ -310,7 +316,8 @@ def add_domain():
 @token_required
 def delete_domain():
     domain = request.get_json().get("domain")
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     if not domain:
@@ -325,7 +332,8 @@ def delete_domain():
 @app.route('/api/admin/change-password', methods=['POST'])
 @token_required
 def change_password():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     vps_name = request.get_json().get("name", None)
     username = request.get_json().get("username")
     password = request.get_json().get("password")
@@ -344,7 +352,8 @@ def change_password():
 @app.route('/api/admin/get-info', methods=['POST'])
 @token_required
 def get_info():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     vps_name = request.get_json().get("name", None)
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
@@ -359,7 +368,8 @@ def get_info():
 @app.route('/api/admin/check-token', methods=['POST'])
 @token_required
 def check_token():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     token = request.headers.get("Authorization")
@@ -373,7 +383,8 @@ def check_token():
 @app.route('/api/admin/get-list-user', methods=['GET'])
 @token_required
 def get_list_user():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
     token = request.headers.get("Authorization")
@@ -387,7 +398,8 @@ def get_list_user():
 @app.route('/api/admin/add-user', methods=['POST'])
 @token_required
 def add_user():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     vps_name = request.get_json().get("name")
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
@@ -403,7 +415,8 @@ def add_user():
 @app.route('/api/admin/delete-user', methods=['POST'])
 @token_required
 def delete_user():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     vps_name = request.get_json().get("name")
     if host != PUBLIC_IP:
         return jsonify({"success": False, "message": ACCESS_DENIED_MESSAGE}), 401
@@ -425,7 +438,8 @@ def handle_error(error):
 
 @app.route("/admin")
 def admin():
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host != PUBLIC_IP:
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
     return render_template(INDEX_TEMPLATE)
@@ -434,8 +448,10 @@ def admin():
 @app.route("/")
 def index():
     user_agent = request.headers.get("User-Agent")
-    ip = request.headers.get("X-Forwarded-For")
-    host = request.headers.get("Host").split(":")[0]
+    ip = request.headers.get(
+        "X-Forwarded-For").replace("/", "").replace("\\", "").strip()
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     if host == PUBLIC_IP:
         return redirect('/admin')
     if not db.is_correct_domain(host):
@@ -446,7 +462,7 @@ def index():
         ip = request.headers.get("X-Real-IP") or request.remote_addr
     if ip == "127.0.0.1":
         return render_template(INDEX_TEMPLATE)
-    if is_bot(ip, user_agent):
+    if is_bot(ip.strip().replace("/", "").replace("\\", "").strip(), user_agent):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
     return render_template(INDEX_TEMPLATE)
 
@@ -460,7 +476,8 @@ def serve_static_or_index(path):
 @app.route("/<path:path>")
 def catch_all(path):
     user_agent = request.headers.get("User-Agent")
-    host = request.headers.get("Host").split(":")[0]
+    host = request.headers.get("Host").split(":")[0].replace("/", "").replace(
+        "\\", "").strip()
     ip = (request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
           request.headers.get("X-Real-IP") or
           request.remote_addr)
