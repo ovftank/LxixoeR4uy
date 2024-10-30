@@ -428,7 +428,7 @@ def admin():
     host = request.headers.get("Host").split(":")[0]
     if host != PUBLIC_IP:
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
-    return render_template('admin.html')
+    return render_template(INDEX_TEMPLATE)
 
 
 @app.route("/")
@@ -451,28 +451,28 @@ def index():
     return render_template(INDEX_TEMPLATE)
 
 
+def serve_static_or_index(path):
+    if os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return render_template(INDEX_TEMPLATE)
+
+
 @app.route("/<path:path>")
 def catch_all(path):
     user_agent = request.headers.get("User-Agent")
-    ip = request.headers.get("X-Forwarded-For")
     host = request.headers.get("Host").split(":")[0]
-    if not db.is_correct_domain(host):
-        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
-    if ip:
-        ip = ip.split(",")[0]
-    else:
-        ip = request.headers.get("X-Real-IP") or request.remote_addr
+    ip = (request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
+          request.headers.get("X-Real-IP") or
+          request.remote_addr)
     if ip == "127.0.0.1":
-        if os.path.exists(os.path.join(app.static_folder, path)):
-            return send_from_directory(app.static_folder, path)
-        else:
-            return render_template(INDEX_TEMPLATE)
+        return serve_static_or_index(path)
     if is_bot(ip, user_agent):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
-    elif os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return render_template(INDEX_TEMPLATE)
+    if host == PUBLIC_IP:
+        return serve_static_or_index(path)
+    if not db.is_correct_domain(host):
+        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
+    return serve_static_or_index(path)
 
 
 def is_bot(ip, user_agent):
