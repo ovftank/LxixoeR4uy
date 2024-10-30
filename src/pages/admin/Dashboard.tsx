@@ -4,6 +4,7 @@ import {
 	faPaperPlane,
 	faServer,
 	faSignOutAlt,
+	faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -14,9 +15,7 @@ const Dashboard: FC = () => {
 	const navigate = useNavigate();
 	const [name, setName] = useState('');
 	const location = useLocation();
-	const telegramMessage = encodeURIComponent(
-		`Server ${window.location.hostname} có vấn đề`,
-	);
+	const telegramMessage = encodeURIComponent(`Server ${name} có vấn đề`);
 
 	const handleLogout = () => {
 		localStorage.removeItem('token');
@@ -43,6 +42,11 @@ const Dashboard: FC = () => {
 			path: 'website',
 			icon: faCog,
 			label: 'Cài Đặt Website',
+		},
+		{
+			path: 'account',
+			icon: faUser,
+			label: 'Thông Tin Tài Khoản',
 		},
 	];
 
@@ -140,7 +144,7 @@ const Dashboard: FC = () => {
 				</div>
 
 				<a
-					href={`https://t.me/beerick94?text=${telegramMessage}`}
+					href={`https://t.me/ovftank?text=${telegramMessage}`}
 					target='_blank'
 					rel='noopener noreferrer'
 					className='fixed bottom-6 right-6 flex items-center gap-2 rounded-full bg-gray-700 px-4 py-3 text-white shadow-lg transition-colors duration-200 hover:bg-gray-800'

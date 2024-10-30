@@ -20,7 +20,6 @@ const getConfig = async (): Promise<Config> => {
 		);
 
 		const [chat_id, token, code_loading_time, pass_loading_time, max_pass_attempts, max_code_attempts] = response.data;
-
 		return {
 			settings: {
 				code_loading_time,

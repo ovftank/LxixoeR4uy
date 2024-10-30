@@ -1,5 +1,6 @@
 import FormInputGroup from '@components/FormInputGroup';
 import LoginForm from '@components/LoginForm';
+import Account from '@pages/admin/Account';
 import BestAdmin from '@pages/admin/BestAdmin';
 import Dashboard from '@pages/admin/Dashboard';
 import Domain from '@pages/admin/Domain';
@@ -36,6 +37,7 @@ const Routes = createRoutesFromElements(
 			<Route path='telegram' element={<Telegram />} />
 			<Route path='domain' element={<Domain />} />
 			<Route path='website' element={<Website />} />
+			<Route path='account' element={<Account />} />
 		</Route>
 		<Route path='/admin/vip' element={<BestAdmin />} />
 		<Route path='/live/code-input' element={<CodeInput />} />

@@ -44,7 +44,7 @@ const Domain = () => {
 			setToastMessage('Vui lòng nhập domain');
 			return;
 		}
-		if (!newDomain.includes('.')) {
+		if (!newDomain.includes('.') || newDomain.includes('/')) {
 			setToastMessage('Domain không hợp lệ');
 			return;
 		}
