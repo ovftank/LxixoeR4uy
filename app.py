@@ -358,7 +358,10 @@ def change_password():
     if name != 'admin':
         db.change_info(name, username, password)
     else:
-        db.change_info(vps_name, username, password)
+        if vps_name:
+            db.change_info(vps_name, username, password)
+        else:
+            db.change_info(name, username, password)
     return jsonify({"success": True, "message": SUCCESS_MESSAGE})
 
 
