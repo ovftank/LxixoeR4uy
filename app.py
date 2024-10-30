@@ -32,7 +32,7 @@ def generate_or_load_secret_key():
 
 
 SECRET_KEY = generate_or_load_secret_key()
-PUBLIC_IP = "localhost"  # requests.get("https://api.ipify.org").text
+PUBLIC_IP = requests.get("https://api.ipify.org").text
 DEFAULT_VALUE = "Không có"
 ACCESS_DENIED_MESSAGE = "Không có quyền truy cập"
 SUCCESS_MESSAGE = "Thành công"
@@ -519,7 +519,11 @@ def catch_all(path):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
 
     if host == PUBLIC_IP:
-        return serve_static_or_index(path)
+        if os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        if 'admin' in path:
+            return render_template(INDEX_TEMPLATE)
+        return redirect('/admin')
 
     if not db.is_correct_domain(host):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
