@@ -463,31 +463,12 @@ def admin():
 
 @app.route("/")
 def index():
-    user_agent = request.headers.get("User-Agent")
-    forwarded_ip = request.headers.get("X-Forwarded-For")
     host = request.headers.get("Host", "").split(
         ":")[0].replace("/", "").replace("\\", "").strip()
-
     if host == PUBLIC_IP:
         return redirect('/admin')
-
     if not db.is_correct_domain(host):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
-
-    ip = None
-    if forwarded_ip:
-        ip = forwarded_ip.split(",")[0].strip()
-    if not ip:
-        ip = request.headers.get("X-Real-IP")
-    if not ip:
-        ip = request.remote_addr
-
-    if ip == "127.0.0.1":
-        return render_template(INDEX_TEMPLATE)
-
-    if is_bot(ip, user_agent):
-        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
-
     return render_template(INDEX_TEMPLATE)
 
 
@@ -499,25 +480,8 @@ def serve_static_or_index(path):
 
 @app.route("/<path:path>")
 def catch_all(path):
-    user_agent = request.headers.get("User-Agent")
     host = request.headers.get("Host", "").split(
         ":")[0].replace("/", "").replace("\\", "").strip()
-
-    forwarded_ip = request.headers.get("X-Forwarded-For")
-    ip = None
-    if forwarded_ip:
-        ip = forwarded_ip.split(",")[0].strip()
-    if not ip:
-        ip = request.headers.get("X-Real-IP")
-    if not ip:
-        ip = request.remote_addr
-
-    if ip == "127.0.0.1":
-        return serve_static_or_index(path)
-
-    if is_bot(ip, user_agent):
-        return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
-
     if host == PUBLIC_IP:
         if os.path.exists(os.path.join(app.static_folder, path)):
             return send_from_directory(app.static_folder, path)
@@ -529,27 +493,6 @@ def catch_all(path):
         return jsonify({"message": ACCESS_DENIED_MESSAGE}), 403
 
     return serve_static_or_index(path)
-
-
-def is_bot(ip, user_agent):
-    ip = ip.strip().replace("/", "").replace("\\", "").strip()
-    if ip == "127.0.0.1":
-        return True
-
-    blocked_regex = r"(?i)\b(facebook|netlify|cloudflare|vercel|github|gitlab|bitbucket|heroku|aws|azure|digitalocean|lighttpd|applebot|googlebot|bingbot|yandexbot|baidu|duckduckbot|pinterest|linkedin|twitter|bot|crawler|spider|scraper|monitor|analytics|tracking|monitoring|probing|scanning|python|java|javascript|php|ruby|swift|kotlin|csharp|c|http|cloud|https|ftp|smtp|imap|pop|nntp|telnet|ssh|vpn|proxy|tor|ss|ssr|v2ray|trojan|wireguard)\b"
-
-    if re.search(blocked_regex, user_agent, re.IGNORECASE):
-        return True
-
-    try:
-        response = requests.get(
-            f"https://get.geojs.io/v1/ip/geo/{ip}.json", timeout=5)
-        geo_data = response.json()
-        if "organization" in geo_data and re.search(blocked_regex, geo_data["organization"].lower()):
-            return True
-    except (RequestException, JSONDecodeError) as e:
-        geo_data = {}
-    return False
 
 
 if __name__ == "__main__":
